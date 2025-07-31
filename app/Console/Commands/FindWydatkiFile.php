@@ -75,9 +75,9 @@ class FindWydatkiFile extends Command
         if (!$sheetsMetadata) {
             $this->warn('⚠️ Nie można pobrać metadanych przez Google Sheets API, próbuję przez Google Drive API...');
             
-            // Fallback: spróbuj pobrać jako Excel przez Google Drive
+            // Fallback: spróbuj eksportować jako Excel przez Google Drive
             $tempPath = storage_path('app/temp/' . uniqid() . '.xlsx');
-            $success = $this->googleDriveService->downloadFile($sheetsFile['id'], $tempPath);
+            $success = $this->googleDriveService->exportSheetAsExcel($sheetsFile['id'], $tempPath);
             
             if (!$success) {
                 $this->error('❌ Nie można pobrać pliku przez Google Drive API');
@@ -93,12 +93,19 @@ class FindWydatkiFile extends Command
             
             $this->info("📋 Arkusz: {$sheetTitle}");
             
+            // Sprawdź wszystkie arkusze
+            $this->info("📋 Wszystkie arkusze:");
+            foreach ($spreadsheet->getSheetNames() as $sheetName) {
+                $this->line("   - {$sheetName}");
+            }
+            $this->line('');
+            
             // Pobierz dane
             $data = [];
             $highestRow = $worksheet->getHighestRow();
             $highestColumn = $worksheet->getHighestColumn();
             
-            for ($row = 1; $row <= min(10, $highestRow); $row++) {
+            for ($row = 1; $row <= min(20, $highestRow); $row++) {
                 $rowData = [];
                 for ($col = 'A'; $col <= $highestColumn; $col++) {
                     $cellValue = $worksheet->getCell($col . $row)->getValue();
@@ -157,6 +164,39 @@ class FindWydatkiFile extends Command
             $this->line("   Wiersz " . ($i + 1) . ": " . implode(' | ', array_map(function($cell) {
                 return is_null($cell) ? 'NULL' : (string)$cell;
             }, $row)));
+        }
+
+        // Sprawdź arkusz "Kredyty" jeśli istnieje
+        if (isset($spreadsheet) && $spreadsheet->sheetNameExists('Kredyty')) {
+            $this->info("\n📊 Analizowanie arkusza 'Kredyty':");
+            $kredytySheet = $spreadsheet->getSheetByName('Kredyty');
+            $highestRow = $kredytySheet->getHighestRow();
+            $highestColumn = $kredytySheet->getHighestColumn();
+            
+            $this->line("   Liczba wierszy: {$highestRow}");
+            $this->line("   Liczba kolumn: " . (ord($highestColumn) - ord('A') + 1));
+            
+            // Pobierz pierwsze 5 wierszy z arkusza Kredyty
+            $kredytyData = [];
+            for ($row = 1; $row <= min(5, $highestRow); $row++) {
+                $rowData = [];
+                for ($col = 'A'; $col <= $highestColumn; $col++) {
+                    $cellValue = $kredytySheet->getCell($col . $row)->getValue();
+                    $rowData[] = $cellValue ?? '';
+                }
+                $kredytyData[] = $rowData;
+            }
+            
+            if (!empty($kredytyData[0])) {
+                $this->line("   Nagłówki: " . implode(', ', $kredytyData[0]));
+            }
+            
+            for ($i = 1; $i < count($kredytyData); $i++) {
+                $row = $kredytyData[$i];
+                $this->line("   Wiersz " . ($i + 1) . ": " . implode(' | ', array_map(function($cell) {
+                    return is_null($cell) ? 'NULL' : (string)$cell;
+                }, $row)));
+            }
         }
 
         $this->info('✅ Analiza zakończona pomyślnie!');

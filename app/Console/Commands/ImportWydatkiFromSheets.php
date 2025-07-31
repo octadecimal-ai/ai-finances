@@ -64,9 +64,43 @@ class ImportWydatkiFromSheets extends Command
 
         $this->info("📊 Importowanie danych z arkusza: {$sheetTitle}");
 
+        // Pobierz dane z arkusza przez eksport Excel
+        $tempPath = storage_path('app/temp/' . uniqid() . '.xlsx');
+        $success = $this->googleDriveService->exportSheetAsExcel($spreadsheetId, $tempPath);
+        
+        if (!$success) {
+            $this->error('❌ Nie można eksportować arkusza jako Excel');
+            return 1;
+        }
+        
+        // Wczytaj jako Excel
+        $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($tempPath);
+        $worksheet = $spreadsheet->getSheetByName($sheetTitle);
+        
+        if (!$worksheet) {
+            $this->error("❌ Arkusz '{$sheetTitle}' nie został znaleziony");
+            unlink($tempPath);
+            return 1;
+        }
+        
         // Pobierz dane z arkusza
-        $data = $this->googleSheetsService->getSheetDataByTitle($spreadsheetId, $sheetTitle);
-        if (!$data || empty($data)) {
+        $data = [];
+        $highestRow = $worksheet->getHighestRow();
+        $highestColumn = $worksheet->getHighestColumn();
+        
+        for ($row = 1; $row <= $highestRow; $row++) {
+            $rowData = [];
+            for ($col = 'A'; $col <= $highestColumn; $col++) {
+                $cellValue = $worksheet->getCell($col . $row)->getValue();
+                $rowData[] = $cellValue ?? '';
+            }
+            $data[] = $rowData;
+        }
+        
+        // Usuń plik tymczasowy
+        unlink($tempPath);
+        
+        if (empty($data)) {
             $this->error('❌ Nie można pobrać danych z arkusza');
             return 1;
         }
@@ -182,6 +216,37 @@ class ImportWydatkiFromSheets extends Command
                 case 'uwagi':
                     $map[$index] = 'notatki';
                     break;
+                // Dodatkowe mapowanie dla danych kredytowych
+                case 'pożyczone':
+                case 'pozyczone':
+                case 'kwota_pożyczona':
+                    $map[$index] = 'kwota';
+                    break;
+                case 'zostało':
+                case 'zostalo':
+                case 'pozostało':
+                    $map[$index] = 'status';
+                    break;
+                case 'kapitał':
+                case 'kapital':
+                case 'kapitał_do_spłaty':
+                    $map[$index] = 'kategoria';
+                    break;
+                case 'rata':
+                case 'rata_miesięczna':
+                    $map[$index] = 'metoda_platnosci';
+                    break;
+                case 'raty':
+                case 'liczba_rat':
+                    $map[$index] = 'notatki';
+                    break;
+                // Mapowanie dla pierwszej kolumny (nazwa kredytu)
+                case '':
+                case 'nazwa':
+                case 'kredyt':
+                case 'pożyczka':
+                    $map[$index] = 'opis';
+                    break;
             }
         }
         
@@ -194,6 +259,7 @@ class ImportWydatkiFromSheets extends Command
     private function processRow(array $row, array $columnMap, string $spreadsheetId, string $sheetTitle, int $rowNumber): ?array
     {
         $data = [
+            'data' => now()->format('Y-m-d'), // Domyślna data dzisiejsza
             'source_file' => $spreadsheetId,
             'source_id' => "{$sheetTitle}_row_{$rowNumber}",
         ];

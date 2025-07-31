@@ -579,4 +579,82 @@ class GoogleDriveService
             return [];
         }
     }
+
+    /**
+     * Export Google Sheets as Excel file
+     */
+    public function exportSheetAsExcel(string $fileId, string $destinationPath): bool
+    {
+        try {
+            $file = $this->service->files->get($fileId);
+            
+            if (!$file) {
+                Log::error('Google Drive export sheet failed - file not found', [
+                    'file_id' => $fileId
+                ]);
+                return false;
+            }
+
+            if ($file->getMimeType() !== 'application/vnd.google-apps.spreadsheet') {
+                Log::error('Google Drive export sheet failed - not a Google Sheets file', [
+                    'file_id' => $fileId,
+                    'mime_type' => $file->getMimeType()
+                ]);
+                return false;
+            }
+
+            // Export as Excel
+            $response = $this->service->files->export($fileId, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', [
+                'alt' => 'media'
+            ]);
+
+            if (empty($response)) {
+                Log::error('Google Drive export sheet failed - empty response', [
+                    'file_id' => $fileId
+                ]);
+                return false;
+            }
+
+            $content = $response->getBody()->getContents();
+            
+            if (empty($content)) {
+                Log::error('Google Drive export sheet failed - empty content', [
+                    'file_id' => $fileId
+                ]);
+                return false;
+            }
+
+            // Ensure directory exists
+            $directory = dirname($destinationPath);
+            if (!is_dir($directory)) {
+                mkdir($directory, 0755, true);
+            }
+
+            // Write to file
+            $bytesWritten = file_put_contents($destinationPath, $content);
+            
+            if ($bytesWritten === false) {
+                Log::error('Google Drive export sheet failed - cannot write file', [
+                    'file_id' => $fileId,
+                    'destination' => $destinationPath
+                ]);
+                return false;
+            }
+
+            Log::info('Google Drive export sheet successful', [
+                'file_id' => $fileId,
+                'destination' => $destinationPath,
+                'bytes_written' => $bytesWritten
+            ]);
+
+            return true;
+
+        } catch (\Exception $e) {
+            Log::error('Google Drive export sheet failed', [
+                'file_id' => $fileId,
+                'error' => $e->getMessage()
+            ]);
+            return false;
+        }
+    }
 }
