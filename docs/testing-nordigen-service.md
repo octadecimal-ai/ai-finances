@@ -2,12 +2,12 @@
 
 ## Przegląd
 
-NordigenService umożliwia integrację z Nordigen Open Banking API. Aby przetestować serwis, musisz najpierw skonfigurować konto w Nordigen i uzyskać odpowiednie klucze API.
+NordigenService umożliwia integrację z GoCardless Bank Account Data API (dawniej Nordigen). Aby przetestować serwis, musisz najpierw skonfigurować konto w GoCardless i uzyskać odpowiednie klucze API.
 
 ## Wymagania wstępne
 
-### 1. Konto Nordigen
-- Zarejestruj się na [Nordigen](https://nordigen.com/)
+### 1. Konto GoCardless Bank Account Data
+- Zarejestruj się na [GoCardless Bank Account Data](https://bankaccountdata.gocardless.com/)
 - Utwórz aplikację w panelu dewelopera
 - Uzyskaj `secret_id` i `secret_key`
 
@@ -265,6 +265,7 @@ Po pomyślnym przetestowaniu NordigenService:
 
 ## Przydatne linki
 
-- [Nordigen API Documentation](https://nordigen.com/en/account_information_documenation/integration/quickstart_guide/)
-- [Nordigen Developer Portal](https://ob.nordigen.com/)
-- [Open Banking Directory](https://www.openbanking.org.uk/) 
+- [GoCardless Bank Account Data API Documentation](https://bankaccountdata.gocardless.com/docs)
+- [GoCardless Developer Portal](https://bankaccountdata.gocardless.com/)
+- [Open Banking Directory](https://www.openbanking.org.uk/)
+- [GoCardless Bank Account Data](https://bankaccountdata.gocardless.com/) 
