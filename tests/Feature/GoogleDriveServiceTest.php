@@ -126,8 +126,7 @@ class GoogleDriveServiceTest extends TestCase
             $uploadedFile = $this->googleDriveService->uploadFile($tempFile, $fileName, $folderId);
             
             if ($uploadedFile === null) {
-                echo "⚠️ Upload pliku nie powiódł się (prawdopodobnie brak OAuth)\n";
-                echo "   To jest normalne dla Service Account bez Shared Drive\n";
+                $this->fail('Upload pliku nie powiódł się - test wymaga poprawnej konfiguracji OAuth');
             } else {
                 $this->assertArrayHasKey('id', $uploadedFile);
                 echo "✓ Przesłano plik: {$uploadedFile['name']} (ID: {$uploadedFile['id']})\n";
@@ -156,7 +155,7 @@ class GoogleDriveServiceTest extends TestCase
             unlink($tempFile);
 
         } catch (\Exception $e) {
-            echo "⚠️ Test uploadu pominięty: " . $e->getMessage() . "\n";
+            $this->fail('Test uploadu nie powiódł się: ' . $e->getMessage());
         }
     }
 
@@ -214,9 +213,7 @@ class GoogleDriveServiceTest extends TestCase
                 );
                 
                 if ($uploadedFile === null) {
-                    echo "⚠️ Upload pliku nie powiódł się - pomijam test dla typu {$type}\n";
-                    unlink($tempUploadFile);
-                    continue;
+                    $this->fail("Upload pliku nie powiódł się dla typu {$type}");
                 }
                 
                 $this->assertArrayHasKey('id', $uploadedFile);
@@ -273,7 +270,7 @@ class GoogleDriveServiceTest extends TestCase
             echo "Wszystkie typy plików zostały poprawnie przesłane, pobrane i zweryfikowane.\n";
 
         } catch (\Exception $e) {
-            echo "⚠️ Test pobierania pliku pominięty: " . $e->getMessage() . "\n";
+            $this->fail('Test pobierania pliku nie powiódł się: ' . $e->getMessage());
         }
     }
 

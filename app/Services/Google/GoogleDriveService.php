@@ -282,18 +282,21 @@ class GoogleDriveService
             }
             
             // Pobierz zawartość pliku
-            $content = $this->service->files->get($fileId, [
+            $response = $this->service->files->get($fileId, [
                 'alt' => 'media'
             ]);
 
-            // Sprawdź czy zawartość nie jest pusta
-            if (empty($content)) {
-                Log::error('Google Drive download file failed - empty content', [
+            // Sprawdź czy response nie jest puste
+            if (empty($response)) {
+                Log::error('Google Drive download file failed - empty response', [
                     'file_id' => $fileId,
                     'file_size' => $file->getSize()
                 ]);
                 return false;
             }
+
+            // Pobierz zawartość z response
+            $content = $response->getBody()->getContents();
 
             // Zapisz do pliku
             $result = file_put_contents($destinationPath, $content);
