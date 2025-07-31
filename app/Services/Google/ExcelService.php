@@ -85,12 +85,16 @@ class ExcelService
             $writer->save($tempPath);
 
             // Upload do Google Drive
-            $fileId = $this->googleDriveService->uploadFile($tempPath, $fileName, $parentFolderId);
+            $uploadResult = $this->googleDriveService->uploadFile($tempPath, $fileName, $parentFolderId);
 
             // Usuń tymczasowy plik
             unlink($tempPath);
 
-            return $fileId;
+            if ($uploadResult === null) {
+                return null;
+            }
+
+            return $uploadResult['id'];
         } catch (Exception $e) {
             Log::error('Excel file creation failed', [
                 'error' => $e->getMessage(),

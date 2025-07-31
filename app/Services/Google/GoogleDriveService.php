@@ -282,6 +282,7 @@ class GoogleDriveService
             }
             
             // Pobierz zawartość pliku
+            /** @var \GuzzleHttp\Psr7\Response $response */
             $response = $this->service->files->get($fileId, [
                 'alt' => 'media'
             ]);

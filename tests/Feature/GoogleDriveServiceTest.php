@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Services\Google\GoogleDriveService;
+use App\Services\Google\ExcelService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -11,6 +12,7 @@ class GoogleDriveServiceTest extends TestCase
     use RefreshDatabase;
 
     private GoogleDriveService $googleDriveService;
+    private ExcelService $excelService;
 
     protected function setUp(): void
     {
@@ -18,6 +20,7 @@ class GoogleDriveServiceTest extends TestCase
         
         try {
             $this->googleDriveService = new GoogleDriveService();
+            $this->excelService = new ExcelService($this->googleDriveService);
         } catch (\Exception $e) {
             // Jeśli OAuth wymaga autoryzacji, to jest normalne
             if (strpos($e->getMessage(), 'Google Drive authorization required') !== false) {
@@ -192,78 +195,32 @@ class GoogleDriveServiceTest extends TestCase
                     ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE),
                     'filename' => 'test_json_file_' . date('Y-m-d_H-i-s') . '.json',
                     'mime_type' => 'application/json'
+                ],
+                'excel' => [
+                    'content' => null, // Będzie utworzony przez ExcelService
+                    'filename' => 'test_excel_file_' . date('Y-m-d_H-i-s') . '.xlsx',
+                    'mime_type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                    'data' => [
+                        ['Data', 'Opis', 'Kwota', 'Kategoria', 'Status'],
+                        ['2025-07-31', 'Zakupy spożywcze', 150.50, 'Żywność', 'Zapłacone'],
+                        ['2025-07-31', 'Benzyna', 200.00, 'Transport', 'Zapłacone'],
+                        ['2025-07-31', 'Kino', 45.00, 'Rozrywka', 'Oczekujące'],
+                        ['2025-07-31', 'Książki', 89.99, 'Edukacja', 'Zapłacone'],
+                        ['2025-07-31', 'Restauracja', 120.00, 'Jedzenie', 'Oczekujące']
+                    ]
                 ]
             ];
 
             foreach ($testFiles as $type => $fileData) {
                 echo "\n--- Test pobierania pliku typu: {$type} ---\n";
                 
-                // Utwórz plik tymczasowy
-                $tempUploadFile = tempnam(sys_get_temp_dir(), 'test_upload_');
-                file_put_contents($tempUploadFile, $fileData['content']);
-                
-                $this->assertFileExists($tempUploadFile, 'Plik tymczasowy nie został utworzony');
-                echo "✓ Utworzono plik tymczasowy: " . basename($tempUploadFile) . " (rozmiar: " . filesize($tempUploadFile) . " bajtów)\n";
-                
-                // Upload pliku na Google Drive
-                $uploadedFile = $this->googleDriveService->uploadFile(
-                    $tempUploadFile, 
-                    $fileData['filename'], 
-                    $folder['id']
-                );
-                
-                if ($uploadedFile === null) {
-                    $this->fail("Upload pliku nie powiódł się dla typu {$type}");
+                if ($type === 'excel') {
+                    // Specjalna obsługa dla plików Excel
+                    $this->testExcelFile($fileData, $folder['id']);
+                } else {
+                    // Standardowa obsługa dla innych typów plików
+                    $this->testStandardFile($fileData, $folder['id']);
                 }
-                
-                $this->assertArrayHasKey('id', $uploadedFile);
-                echo "✓ Przesłano plik: {$uploadedFile['name']} (ID: {$uploadedFile['id']})\n";
-                
-                // Pobierz metadane pliku
-                $fileMetadata = $this->googleDriveService->getFileMetadata($uploadedFile['id']);
-                $this->assertNotNull($fileMetadata, 'Nie można pobrać metadanych pliku');
-                $this->assertEquals($fileData['filename'], $fileMetadata['name']);
-                echo "✓ Metadane pliku: rozmiar {$fileMetadata['size']} bajtów, typ MIME: {$fileMetadata['mime_type']}\n";
-                
-                // Pobierz plik z Google Drive
-                $tempDownloadFile = tempnam(sys_get_temp_dir(), 'test_download_');
-                $downloadSuccess = $this->googleDriveService->downloadFile($uploadedFile['id'], $tempDownloadFile);
-                
-                $this->assertTrue($downloadSuccess, 'Nie można pobrać pliku z Google Drive');
-                $this->assertFileExists($tempDownloadFile, 'Pobrany plik nie istnieje');
-                echo "✓ Plik został pobrany pomyślnie\n";
-                
-                // Weryfikuj zawartość pliku
-                $originalContent = $fileData['content'];
-                $downloadedContent = file_get_contents($tempDownloadFile);
-                
-                $this->assertEquals($originalContent, $downloadedContent, 'Zawartość pobranego pliku nie zgadza się z oryginałem');
-                echo "✓ Zawartość pliku jest identyczna z oryginałem\n";
-                
-                // Weryfikuj rozmiar pliku
-                $originalSize = strlen($originalContent);
-                $downloadedSize = filesize($tempDownloadFile);
-                
-                $this->assertEquals($originalSize, $downloadedSize, 'Rozmiar pobranego pliku nie zgadza się z oryginałem');
-                echo "✓ Rozmiar pliku jest identyczny: {$originalSize} bajtów\n";
-                
-                // Weryfikuj hash pliku (dla dodatkowej pewności)
-                $originalHash = md5($originalContent);
-                $downloadedHash = md5_file($tempDownloadFile);
-                
-                $this->assertEquals($originalHash, $downloadedHash, 'Hash pobranego pliku nie zgadza się z oryginałem');
-                echo "✓ Hash MD5 pliku jest identyczny: {$originalHash}\n";
-                
-                // Sprawdź czy plik może być ponownie przeczytany
-                $reReadContent = file_get_contents($tempDownloadFile);
-                $this->assertEquals($originalContent, $reReadContent, 'Ponowne odczytanie pliku dało inne wyniki');
-                echo "✓ Ponowne odczytanie pliku: OK\n";
-                
-                // Czyszczenie plików tymczasowych
-                unlink($tempUploadFile);
-                unlink($tempDownloadFile);
-                
-                echo "✓ Test pobierania i weryfikacji pliku typu {$type}: ZAKOŃCZONY SUKCESEM\n";
             }
 
             echo "\n🎉 Test pobierania i weryfikacji plików zakończony sukcesem!\n";
@@ -272,6 +229,144 @@ class GoogleDriveServiceTest extends TestCase
         } catch (\Exception $e) {
             $this->fail('Test pobierania pliku nie powiódł się: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Test standardowego pliku (txt, csv, json)
+     */
+    private function testStandardFile(array $fileData, string $folderId): void
+    {
+        // Utwórz plik tymczasowy
+        $tempUploadFile = tempnam(sys_get_temp_dir(), 'test_upload_');
+        file_put_contents($tempUploadFile, $fileData['content']);
+        
+        $this->assertFileExists($tempUploadFile, 'Plik tymczasowy nie został utworzony');
+        echo "✓ Utworzono plik tymczasowy: " . basename($tempUploadFile) . " (rozmiar: " . filesize($tempUploadFile) . " bajtów)\n";
+        
+        // Upload pliku na Google Drive
+        $uploadedFile = $this->googleDriveService->uploadFile(
+            $tempUploadFile, 
+            $fileData['filename'], 
+            $folderId
+        );
+        
+        if ($uploadedFile === null) {
+            $this->fail("Upload pliku nie powiódł się");
+        }
+        
+        $this->assertArrayHasKey('id', $uploadedFile);
+        echo "✓ Przesłano plik: {$uploadedFile['name']} (ID: {$uploadedFile['id']})\n";
+        
+        // Pobierz metadane pliku
+        $fileMetadata = $this->googleDriveService->getFileMetadata($uploadedFile['id']);
+        $this->assertNotNull($fileMetadata, 'Nie można pobrać metadanych pliku');
+        $this->assertEquals($fileData['filename'], $fileMetadata['name']);
+        echo "✓ Metadane pliku: rozmiar {$fileMetadata['size']} bajtów, typ MIME: {$fileMetadata['mime_type']}\n";
+        
+        // Pobierz plik z Google Drive
+        $tempDownloadFile = tempnam(sys_get_temp_dir(), 'test_download_');
+        $downloadSuccess = $this->googleDriveService->downloadFile($uploadedFile['id'], $tempDownloadFile);
+        
+        $this->assertTrue($downloadSuccess, 'Nie można pobrać pliku z Google Drive');
+        $this->assertFileExists($tempDownloadFile, 'Pobrany plik nie istnieje');
+        echo "✓ Plik został pobrany pomyślnie\n";
+        
+        // Weryfikuj zawartość pliku
+        $originalContent = $fileData['content'];
+        $downloadedContent = file_get_contents($tempDownloadFile);
+        
+        $this->assertEquals($originalContent, $downloadedContent, 'Zawartość pobranego pliku nie zgadza się z oryginałem');
+        echo "✓ Zawartość pliku jest identyczna z oryginałem\n";
+        
+        // Weryfikuj rozmiar pliku
+        $originalSize = strlen($originalContent);
+        $downloadedSize = filesize($tempDownloadFile);
+        
+        $this->assertEquals($originalSize, $downloadedSize, 'Rozmiar pobranego pliku nie zgadza się z oryginałem');
+        echo "✓ Rozmiar pliku jest identyczny: {$originalSize} bajtów\n";
+        
+        // Weryfikuj hash pliku (dla dodatkowej pewności)
+        $originalHash = md5($originalContent);
+        $downloadedHash = md5_file($tempDownloadFile);
+        
+        $this->assertEquals($originalHash, $downloadedHash, 'Hash pobranego pliku nie zgadza się z oryginałem');
+        echo "✓ Hash MD5 pliku jest identyczny: {$originalHash}\n";
+        
+        // Sprawdź czy plik może być ponownie przeczytany
+        $reReadContent = file_get_contents($tempDownloadFile);
+        $this->assertEquals($originalContent, $reReadContent, 'Ponowne odczytanie pliku dało inne wyniki');
+        echo "✓ Ponowne odczytanie pliku: OK\n";
+        
+        // Czyszczenie plików tymczasowych
+        unlink($tempUploadFile);
+        unlink($tempDownloadFile);
+        
+        echo "✓ Test pobierania i weryfikacji pliku: ZAKOŃCZONY SUKCESEM\n";
+    }
+
+    /**
+     * Test pliku Excel
+     */
+    private function testExcelFile(array $fileData, string $folderId): void
+    {
+        // Utwórz plik Excel z danymi testowymi
+        $excelData = $fileData['data'];
+        $fileName = $fileData['filename'];
+        
+        echo "✓ Tworzenie pliku Excel z " . count($excelData) . " wierszami danych\n";
+        
+        // Utwórz plik Excel i upload do Google Drive
+        $fileId = $this->excelService->createExcelFile($excelData, $fileName, 'Finanse', $folderId);
+        
+        if ($fileId === null) {
+            $this->fail('Nie udało się utworzyć pliku Excel');
+        }
+        
+        echo "✓ Utworzono i przesłano plik Excel: {$fileName} (ID: {$fileId})\n";
+        
+        // Pobierz metadane pliku
+        $fileMetadata = $this->googleDriveService->getFileMetadata($fileId);
+        $this->assertNotNull($fileMetadata, 'Nie można pobrać metadanych pliku Excel');
+        $this->assertEquals($fileName, $fileMetadata['name']);
+        echo "✓ Metadane pliku Excel: rozmiar {$fileMetadata['size']} bajtów\n";
+        
+        // Pobierz plik Excel z Google Drive
+        $tempDownloadFile = tempnam(sys_get_temp_dir(), 'test_excel_download_');
+        $downloadSuccess = $this->googleDriveService->downloadFile($fileId, $tempDownloadFile);
+        
+        $this->assertTrue($downloadSuccess, 'Nie można pobrać pliku Excel z Google Drive');
+        $this->assertFileExists($tempDownloadFile, 'Pobrany plik Excel nie istnieje');
+        echo "✓ Plik Excel został pobrany pomyślnie\n";
+        
+        // Weryfikuj zawartość pliku Excel - pobierz dane z pobranego pliku
+        $downloadedData = $this->excelService->getExcelData($fileId, 'Finanse');
+        $this->assertNotNull($downloadedData, 'Nie można odczytać danych z pobranego pliku Excel');
+        
+        // Porównaj dane
+        $this->assertEquals($excelData, $downloadedData, 'Dane w pobranym pliku Excel nie zgadzają się z oryginałem');
+        echo "✓ Dane w pliku Excel są identyczne z oryginałem\n";
+        
+        // Weryfikuj rozmiar pliku
+        $downloadedSize = filesize($tempDownloadFile);
+        $this->assertGreaterThan(0, $downloadedSize, 'Pobrany plik Excel jest pusty');
+        echo "✓ Rozmiar pliku Excel: {$downloadedSize} bajtów\n";
+        
+        // Sprawdź czy plik może być ponownie przeczytany
+        $reReadData = $this->excelService->getExcelData($fileId, 'Finanse');
+        $this->assertEquals($excelData, $reReadData, 'Ponowne odczytanie pliku Excel dało inne wyniki');
+        echo "✓ Ponowne odczytanie pliku Excel: OK\n";
+        
+        // Sprawdź metadane Excel
+        $excelMetadata = $this->excelService->getExcelMetadata($fileId);
+        $this->assertNotNull($excelMetadata, 'Nie można pobrać metadanych Excel');
+        $this->assertArrayHasKey('sheet_names', $excelMetadata);
+        $this->assertContains('Finanse', $excelMetadata['sheet_names']);
+        echo "✓ Metadane Excel: " . count($excelMetadata['sheet_names']) . " arkuszy\n";
+        
+        // Czyszczenie pliku tymczasowego
+        unlink($tempDownloadFile);
+        
+        echo "✓ Test pobierania i weryfikacji pliku Excel: ZAKOŃCZONY SUKCESEM\n";
     }
 
     /**
