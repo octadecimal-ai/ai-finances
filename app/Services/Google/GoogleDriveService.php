@@ -147,10 +147,12 @@ class GoogleDriveService
     {
         try {
             $about = $this->service->about->get(['fields' => 'user']);
+            $user = $about->getUser();
+            
             return [
-                'id' => $about->getUser()->getId(),
-                'email' => $about->getUser()->getEmailAddress(),
-                'name' => $about->getUser()->getDisplayName(),
+                'id' => $user->getId() ?? null,
+                'email' => $user->getEmailAddress() ?? null,
+                'name' => $user->getDisplayName() ?? null,
             ];
         } catch (\Exception $e) {
             Log::error('Google Drive get user info failed', [
@@ -229,9 +231,10 @@ class GoogleDriveService
     public function downloadFile(string $fileId, string $destinationPath): bool
     {
         try {
-            $content = $this->service->files->get($fileId, [
+            $response = $this->service->files->get($fileId, [
                 'alt' => 'media'
-            ])->getBody()->getContents();
+            ]);
+            $content = $response->getBody()->getContents();
 
             return file_put_contents($destinationPath, $content) !== false;
 
@@ -270,7 +273,9 @@ class GoogleDriveService
     {
         try {
             $content = file_get_contents($filePath);
-            $this->service->files->update($fileId, null, [
+            $fileMetadata = new DriveFile();
+            
+            $this->service->files->update($fileId, $fileMetadata, [
                 'data' => $content,
                 'mimeType' => mime_content_type($filePath),
                 'uploadType' => 'multipart'

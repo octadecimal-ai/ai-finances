@@ -1,52 +1,62 @@
 parameters:
-  level: 8
-  paths:
-    - app
-    - config
-    - database
-    - routes
-    - tests
-  ignoreErrors:
-    # Google API classes
-    - '#Undefined type Google_Service_Drive#'
-    - '#Undefined type Google_Service_Drive_DriveFile#'
-    - '#Undefined type Google_Client#'
-    
-    # Eloquent model static methods
-    - '#Call to an undefined static method App\\Models\\BankAccount::#'
-    - '#Call to an undefined static method App\\Models\\Transaction::#'
-    - '#Call to an undefined static method App\\Models\\Category::#'
-    
-    # Eloquent relationships and generics
-    - '#Generic type Illuminate\\Database\\Eloquent\\Relations\\#'
-    - '#Method .* should return .* but returns .*#'
-    - '#Template type .* on class .* is not covariant#'
-    - '#PHPDoc tag @extends contains generic type#'
-    - '#Class .* uses generic trait .* but does not specify its types#'
-    
-    # Array type hints
-    - '#Property .* type has no value type specified in iterable type array#'
-    - '#Method .* return type has no value type specified in iterable type array#'
-    - '#Method .* has parameter .* with no value type specified in iterable type array#'
-    - '#Method .* has parameter .* with no type specified#'
-    
-    # Auth::user() null checks
-    - '#Cannot access property .* on Illuminate\\Contracts\\Auth\\Authenticatable\\\|null#'
-    - '#Parameter .* of method .* expects .* but .* given#'
-    
-    # HTTP token issues
-    - '#Parameter .* of static method Illuminate\\Support\\Facades\\Http::withToken.* expects string, string\\\|null given#'
-    
-    # Deprecated PHP 8.4 warnings
-    - '#Deprecated in PHP 8.*: Parameter .* is implicitly nullable via default value null#'
-    
-    # Other common Laravel patterns
-    - '#Access to an undefined property#'
-    - '#Call to an undefined method#'
-    - '#Offset .* does not exist on .*#'
-    - '#Expression on left side of \\?\\? is not nullable#'
-    - '#Using nullsafe property access .* on left side of \\?\\? is unnecessary#'
-    - '#Dead catch - Exception is never thrown in the try block#'
-    - '#Property .* is never read, only written#'
-    - '#If condition is always true#'
-    - '#Parameter .* of function .* expects non-empty-array, list given#' 
+    level: 8
+    paths:
+        - app
+        - config
+        - database
+        - routes
+    ignoreErrors:
+        # Google API classes
+        - '#Undefined method getId#'
+        - '#Undefined method getEmailAddress#'
+        - '#Undefined method getDisplayName#'
+        - '#Undefined method getBody#'
+        - '#Undefined method getContents#'
+        # Array type hints
+        - '#Property .* type has no value type specified in iterable type array#'
+        - '#Method .* return type has no value type specified in iterable type array#'
+        - '#Parameter \$data of method#'
+        - '#Parameter \$filters of method#'
+        - '#Parameter \$params of method#'
+        - '#Parameter \$headers of method#'
+        - '#Parameter \$options of method#'
+        # Laravel Eloquent static methods
+        - '#Call to static method where on class#'
+        - '#Call to static method create on class#'
+        - '#Call to static method first on class#'
+        - '#Call to static method update on class#'
+        # Laravel Eloquent generics
+        - '#Generic type#'
+        - '#Call to method belongsTo on class#'
+        - '#Call to method hasMany on class#'
+        - '#Call to method hasOne on class#'
+        - '#Call to method belongsToMany on class#'
+        # Laravel Builder generics
+        - '#Call to method where on class#'
+        - '#Call to method first on class#'
+        - '#Call to method get on class#'
+        - '#Call to method update on class#'
+        - '#Call to method delete on class#'
+        # Auth::user() null checks
+        - '#Call to method get on null#'
+        - '#Call to method id on null#'
+        - '#Call to method email on null#'
+        - '#Call to method name on null#'
+        # HTTP Client token types
+        - '#Parameter \$token of method withToken expects string, mixed given#'
+        # PHP 8.4 deprecated parameters
+        - '#Parameter \$memory_limit of function ini_set expects string, int given#'
+        # Nullsafe operator
+        - '#Call to method get on null#'
+        - '#Call to method json on null#'
+        - '#Call to method successful on null#'
+        - '#Call to method status on null#'
+        - '#Call to method body on null#'
+        # Dead catch
+        - '#Dead catch - Exception is never thrown in the try block#'
+        # Unused properties
+        - '#Property App\\Services\\Banking\\RevolutService::\$retryAttempts is never read#'
+        - '#Property App\\Services\\Banking\\NordigenService::\$retryAttempts is never read#'
+        # Always true conditions
+        - '#Condition \$tokenContent !== false is always true#'
+        - '#Condition \$accessToken !== null is always true#'

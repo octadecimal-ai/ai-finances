@@ -25,16 +25,14 @@ class ExcelService
     {
         try {
             // Pobierz plik z Google Drive
-            $fileContent = $this->googleDriveService->downloadFile($fileId);
-            
-            if (!$fileContent) {
-                throw new Exception('Nie udało się pobrać pliku z Google Drive');
-            }
-
-            // Zapisz tymczasowo plik
             $tempPath = storage_path('app/temp/' . uniqid() . '.xlsx');
             Storage::makeDirectory('temp');
-            file_put_contents($tempPath, $fileContent);
+            
+            $success = $this->googleDriveService->downloadFile($fileId, $tempPath);
+            
+            if (!$success) {
+                throw new Exception('Nie udało się pobrać pliku z Google Drive');
+            }
 
             // Wczytaj arkusz
             $spreadsheet = IOFactory::load($tempPath);
@@ -87,7 +85,7 @@ class ExcelService
             $writer->save($tempPath);
 
             // Upload do Google Drive
-            $fileId = $this->googleDriveService->uploadFile($tempPath, $fileName, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', $parentFolderId);
+            $fileId = $this->googleDriveService->uploadFile($tempPath, $fileName, $parentFolderId);
 
             // Usuń tymczasowy plik
             unlink($tempPath);
@@ -109,16 +107,14 @@ class ExcelService
     {
         try {
             // Pobierz aktualny plik
-            $fileContent = $this->googleDriveService->downloadFile($fileId);
-            
-            if (!$fileContent) {
-                throw new Exception('Nie udało się pobrać pliku z Google Drive');
-            }
-
-            // Zapisz tymczasowo plik
             $tempPath = storage_path('app/temp/' . uniqid() . '.xlsx');
             Storage::makeDirectory('temp');
-            file_put_contents($tempPath, $fileContent);
+            
+            $success = $this->googleDriveService->downloadFile($fileId, $tempPath);
+            
+            if (!$success) {
+                throw new Exception('Nie udało się pobrać pliku z Google Drive');
+            }
 
             // Wczytaj arkusz
             $spreadsheet = IOFactory::load($tempPath);
@@ -131,7 +127,9 @@ class ExcelService
             }
 
             // Wyczyść arkusz i dodaj nowe dane
-            $worksheet->removeAllRows();
+            $highestRow = $worksheet->getHighestRow();
+            $highestColumn = $worksheet->getHighestColumn();
+            $worksheet->removeRow(1, $highestRow);
             $this->addDataToWorksheet($worksheet, $data);
 
             // Zapisz plik
@@ -139,7 +137,7 @@ class ExcelService
             $writer->save($tempPath);
 
             // Aktualizuj w Google Drive
-            $success = $this->googleDriveService->updateFile($fileId, $tempPath, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            $success = $this->googleDriveService->updateFile($fileId, $tempPath);
 
             // Usuń tymczasowy plik
             unlink($tempPath);
@@ -190,15 +188,14 @@ class ExcelService
     public function getSheetNames(string $fileId): array
     {
         try {
-            $fileContent = $this->googleDriveService->downloadFile($fileId);
-            
-            if (!$fileContent) {
-                return [];
-            }
-
             $tempPath = storage_path('app/temp/' . uniqid() . '.xlsx');
             Storage::makeDirectory('temp');
-            file_put_contents($tempPath, $fileContent);
+            
+            $success = $this->googleDriveService->downloadFile($fileId, $tempPath);
+            
+            if (!$success) {
+                return [];
+            }
 
             $spreadsheet = IOFactory::load($tempPath);
             $sheetNames = $spreadsheet->getSheetNames();
@@ -221,7 +218,7 @@ class ExcelService
     public function getExcelMetadata(string $fileId): ?array
     {
         try {
-            $fileInfo = $this->googleDriveService->getFile($fileId);
+            $fileInfo = $this->googleDriveService->getFileMetadata($fileId);
             
             if (!$fileInfo) {
                 return null;
@@ -233,8 +230,8 @@ class ExcelService
                 'id' => $fileInfo['id'],
                 'name' => $fileInfo['name'],
                 'size' => $fileInfo['size'],
-                'created_time' => $fileInfo['createdTime'],
-                'modified_time' => $fileInfo['modifiedTime'],
+                'created_time' => $fileInfo['created_time'],
+                'modified_time' => $fileInfo['modified_time'],
                 'sheet_names' => $sheetNames,
                 'sheet_count' => count($sheetNames),
             ];
