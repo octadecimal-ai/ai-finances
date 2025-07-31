@@ -1,0 +1,14 @@
+parameters:
+  level: 8
+  paths:
+    - app
+    - config
+    - database
+    - routes
+    - tests
+  ignoreErrors:
+    - '#Undefined type Google_Service_Drive#'
+    - '#Undefined type Google_Service_Drive_DriveFile#'
+    - '#Undefined type Google_Client#'
+    - '#Call to an undefined method#'
+    - '#Access to an undefined property#' 

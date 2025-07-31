@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Builder;
 
 class Transaction extends Model
 {
@@ -53,22 +54,22 @@ class Transaction extends Model
         return $this->belongsTo(Category::class);
     }
 
-    public function scopeIncome($query)
+    public function scopeIncome(Builder $query): Builder
     {
         return $query->where('type', 'credit');
     }
 
-    public function scopeExpense($query)
+    public function scopeExpense(Builder $query): Builder
     {
         return $query->where('type', 'debit');
     }
 
-    public function scopeByDateRange($query, $startDate, $endDate)
+    public function scopeByDateRange(Builder $query, string $startDate, string $endDate): Builder
     {
         return $query->whereBetween('transaction_date', [$startDate, $endDate]);
     }
 
-    public function scopeByCategory($query, $categoryId)
+    public function scopeByCategory(Builder $query, int $categoryId): Builder
     {
         return $query->where('category_id', $categoryId);
     }

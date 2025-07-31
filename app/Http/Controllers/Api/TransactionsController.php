@@ -260,7 +260,7 @@ class TransactionsController extends Controller
                 ->get()
                 ->map(function ($item) {
                     return [
-                        'category' => $item->category?->name ?? 'Nieprzypisana',
+                        'category' => $item->category !== null ? $item->category->name : 'Nieprzypisana',
                         'total_amount' => $item->total_amount,
                         'count' => $item->count,
                     ];

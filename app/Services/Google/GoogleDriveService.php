@@ -2,6 +2,9 @@
 
 namespace App\Services\Google;
 
+// @capstan-ignore-next-line
+// @psalm-suppress UndefinedClass
+
 use Google_Client;
 use Google_Service_Drive;
 use Google_Service_Drive_DriveFile;
@@ -12,18 +15,22 @@ use Exception;
 
 class GoogleDriveService
 {
-    private Google_Client $client;
-    private Google_Service_Drive $service;
+    /** @var Google_Client */
+    private $client;
+    /** @var Google_Service_Drive */
+    private $service;
     private string $applicationName;
     private string $credentialsPath;
-    private string $tokenPath;
+    /** @var array<string> */
     private array $scopes;
 
+    /**
+     * @throws Exception
+     */
     public function __construct()
     {
         $this->applicationName = config('google.application_name', 'Finances Analyzer');
         $this->credentialsPath = config('google.credentials_path');
-        $this->tokenPath = config('google.token_path');
         $this->scopes = config('google.scopes', [
             'https://www.googleapis.com/auth/drive',
             'https://www.googleapis.com/auth/drive.file',
@@ -46,7 +53,7 @@ class GoogleDriveService
             $this->client->setAccessType('offline');
             $this->client->setPrompt('select_account consent');
 
-            // Load previously authorized token from cache
+            // Load previously authorized token from a cache
             $tokenArray = Cache::get('google_drive_token');
             if ($tokenArray) {
                 $this->client->setAccessToken($tokenArray);
@@ -101,31 +108,8 @@ class GoogleDriveService
     }
 
     /**
-     * Pobiera listę plików z Google Drive
-     */
-    public function listFiles(array $filters = []): array
-    {
-        try {
-            $query = $this->buildQuery($filters);
-            
-            $results = $this->service->files->listFiles([
-                'pageSize' => 50,
-                'fields' => 'nextPageToken, files(id, name, mimeType, size, createdTime, modifiedTime, parents)',
-                'q' => $query,
-            ]);
-
-            return $results->getFiles();
-        } catch (Exception $e) {
-            Log::error('Google Drive list files failed', [
-                'error' => $e->getMessage(),
-                'filters' => $filters,
-            ]);
-            return [];
-        }
-    }
-
-    /**
      * Pobiera plik z Google Drive
+     * @return array<string, mixed>|null
      */
     public function getFile(string $fileId): ?array
     {
@@ -176,10 +160,10 @@ class GoogleDriveService
     /**
      * Uploaduje plik do Google Drive
      */
-    public function uploadFile(string $filePath, string $fileName, string $mimeType = null, string $parentFolderId = null): ?string
+    public function uploadFile(string $filePath, string $fileName, ?string $mimeType = null, ?string $parentFolderId = null): ?string
     {
         try {
-            $fileMetadata = new Google_Service_Drive_DriveFile([
+            $fileMetadata = new \Google_Service_Drive_DriveFile([
                 'name' => $fileName,
             ]);
 
@@ -213,10 +197,10 @@ class GoogleDriveService
     /**
      * Tworzy folder w Google Drive
      */
-    public function createFolder(string $folderName, string $parentFolderId = null): ?string
+    public function createFolder(string $folderName, ?string $parentFolderId = null): ?string
     {
         try {
-            $fileMetadata = new Google_Service_Drive_DriveFile([
+            $fileMetadata = new \Google_Service_Drive_DriveFile([
                 'name' => $folderName,
                 'mimeType' => 'application/vnd.google-apps.folder',
             ]);
@@ -259,7 +243,7 @@ class GoogleDriveService
     /**
      * Aktualizuje plik w Google Drive
      */
-    public function updateFile(string $fileId, string $filePath, string $mimeType = null): bool
+    public function updateFile(string $fileId, string $filePath, ?string $mimeType = null): bool
     {
         try {
             if (!$mimeType) {
@@ -286,6 +270,8 @@ class GoogleDriveService
 
     /**
      * Pobiera pliki Excel z Google Drive
+     * @param array<string, string> $filters
+     * @return array<int, mixed>
      */
     public function getExcelFiles(array $filters = []): array
     {
@@ -303,7 +289,62 @@ class GoogleDriveService
     }
 
     /**
+     * Pobiera listę plików z Google Drive
+     * @param array<string, string> $filters
+     * @return array<int, mixed>
+     */
+    public function listFiles(array $filters = []): array
+    {
+        try {
+            $query = $this->buildQuery($filters);
+
+            $results = $this->service->files->listFiles([
+                'pageSize' => 50,
+                'fields' => 'nextPageToken, files(id, name, mimeType, size, createdTime, modifiedTime, parents)',
+                'q' => $query,
+            ]);
+
+            return $results->getFiles();
+        } catch (Exception $e) {
+            Log::error('Google Drive list files failed', [
+                'error' => $e->getMessage(),
+                'filters' => $filters,
+            ]);
+            return [];
+        }
+    }
+
+    /**
+     * Buduje zapytanie do Google Drive API
+     * @param array<string, string> $filters
+     */
+    private function buildQuery(array $filters): string
+    {
+        $conditions = [];
+
+        foreach ($filters as $key => $value) {
+            switch ($key) {
+                case 'name':
+                case 'parents':
+                case 'mimeType':
+                    $conditions[] = $value;
+                    break;
+                case 'trashed':
+                    $conditions[] = "trashed=$value";
+                    break;
+                case 'modifiedTime':
+                    $conditions[] = "modifiedTime > '$value'";
+                    break;
+            }
+        }
+
+        return implode(' and ', $conditions);
+    }
+
+    /**
      * Pobiera pliki CSV z Google Drive
+     * @param array<string, string> $filters
+     * @return array<int, mixed>
      */
     public function getCsvFiles(array $filters = []): array
     {
@@ -313,6 +354,8 @@ class GoogleDriveService
 
     /**
      * Pobiera pliki PDF z Google Drive
+     * @param array<string, string> $filters
+     * @return array<int, mixed>
      */
     public function getPdfFiles(array $filters = []): array
     {
@@ -322,6 +365,8 @@ class GoogleDriveService
 
     /**
      * Wyszukuje pliki po nazwie
+     * @param array<string, string> $filters
+     * @return array<int, mixed>
      */
     public function searchFiles(string $query, array $filters = []): array
     {
@@ -331,6 +376,8 @@ class GoogleDriveService
 
     /**
      * Pobiera pliki z określonego folderu
+     * @param array<string, string> $filters
+     * @return array<int, mixed>
      */
     public function getFilesFromFolder(string $folderId, array $filters = []): array
     {
@@ -340,6 +387,7 @@ class GoogleDriveService
 
     /**
      * Pobiera statystyki użycia
+     * @return array<string, mixed>
      */
     public function getUsageStats(): array
     {
@@ -349,7 +397,7 @@ class GoogleDriveService
             ]);
 
             $quota = $about->getStorageQuota();
-            
+
             return [
                 'total' => $quota->getLimit(),
                 'used' => $quota->getUsage(),
@@ -381,36 +429,6 @@ class GoogleDriveService
     }
 
     /**
-     * Buduje zapytanie do Google Drive API
-     */
-    private function buildQuery(array $filters): string
-    {
-        $conditions = [];
-
-        foreach ($filters as $key => $value) {
-            switch ($key) {
-                case 'mimeType':
-                    $conditions[] = $value;
-                    break;
-                case 'name':
-                    $conditions[] = $value;
-                    break;
-                case 'parents':
-                    $conditions[] = $value;
-                    break;
-                case 'trashed':
-                    $conditions[] = "trashed=$value";
-                    break;
-                case 'modifiedTime':
-                    $conditions[] = "modifiedTime > '$value'";
-                    break;
-            }
-        }
-
-        return implode(' and ', $conditions);
-    }
-
-    /**
      * Wyczyść cache tokenów
      */
     public function clearTokenCache(): void
@@ -420,6 +438,7 @@ class GoogleDriveService
 
     /**
      * Pobiera informacje o użytkowniku
+     * @return array<string, mixed>|null
      */
     public function getUserInfo(): ?array
     {
@@ -429,7 +448,7 @@ class GoogleDriveService
             ]);
 
             $user = $about->getUser();
-            
+
             return [
                 'id' => $user->getId(),
                 'email' => $user->getEmailAddress(),
@@ -443,4 +462,4 @@ class GoogleDriveService
             return null;
         }
     }
-} 
+}

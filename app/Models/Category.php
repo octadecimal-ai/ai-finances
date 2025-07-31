@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Builder;
 
 class Category extends Model
 {
@@ -30,27 +32,27 @@ class Category extends Model
         return $this->hasMany(Transaction::class);
     }
 
-    public function parent()
+    public function parent(): BelongsTo
     {
         return $this->belongsTo(Category::class, 'parent_id');
     }
 
-    public function children()
+    public function children(): HasMany
     {
         return $this->hasMany(Category::class, 'parent_id');
     }
 
-    public function scopeActive($query)
+    public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);
     }
 
-    public function scopeDefault($query)
+    public function scopeDefault(Builder $query): Builder
     {
         return $query->where('is_default', true);
     }
 
-    public function scopeRoot($query)
+    public function scopeRoot(Builder $query): Builder
     {
         return $query->whereNull('parent_id');
     }

@@ -6,7 +6,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Builder;
 
+/**
+ * @template TFactory
+ * @extends Model<TFactory>
+ */
 class BankAccount extends Model
 {
     use HasFactory;
@@ -43,12 +48,12 @@ class BankAccount extends Model
         return $this->hasMany(Transaction::class);
     }
 
-    public function scopeActive($query)
+    public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);
     }
 
-    public function scopeSyncEnabled($query)
+    public function scopeSyncEnabled(Builder $query): Builder
     {
         return $query->where('sync_enabled', true);
     }
