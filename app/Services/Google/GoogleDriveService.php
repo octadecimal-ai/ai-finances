@@ -2,15 +2,19 @@
 
 namespace App\Services\Google;
 
+use Google\Client;
+use Google\Service\Drive;
+use Google\Service\Drive\DriveFile;
+use Google\Service\Drive\Permission;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class GoogleDriveService
 {
-    /** @var \Google_Client */
+    /** @var Client */
     private $client;
     
-    /** @var \Google_Service_Drive */
+    /** @var Drive */
     private $service;
     
     private string $applicationName;
@@ -18,6 +22,9 @@ class GoogleDriveService
     private string $credentialsPath;
     private string $tokenPath;
 
+    /**
+     * @throws \Google\Exception
+     */
     public function __construct()
     {
         $this->applicationName = config('google.application_name', 'Finances App');
@@ -27,17 +34,18 @@ class GoogleDriveService
         ]);
         $this->credentialsPath = config('google.credentials_path');
         $this->tokenPath = storage_path('app/google/token.json');
-        
+
         $this->initializeClient();
     }
 
     /**
-     * Inicjalizuje Google Client
+     * @return void
+     * @throws \Google\Exception
      */
     private function initializeClient(): void
     {
         try {
-            $this->client = new \Google_Client();
+            $this->client = new Client();
             $this->client->setApplicationName($this->applicationName);
             $this->client->setScopes($this->scopes);
             $this->client->setAuthConfig($this->credentialsPath);
@@ -65,7 +73,7 @@ class GoogleDriveService
                     Log::info('Google Drive authorization required', ['auth_url' => $authUrl]);
                     throw new \Exception('Google Drive authorization required. Please visit: ' . $authUrl);
                 }
-                
+
                 // Save the token to a file
                 if (!is_dir(dirname($this->tokenPath))) {
                     mkdir(dirname($this->tokenPath), 0700, true);
@@ -73,7 +81,7 @@ class GoogleDriveService
                 file_put_contents($this->tokenPath, json_encode($this->client->getAccessToken()));
             }
 
-            $this->service = new \Google_Service_Drive($this->client);
+            $this->service = new Drive($this->client);
 
         } catch (\Exception $e) {
             Log::error('Google Drive client initialization failed', [
@@ -160,7 +168,7 @@ class GoogleDriveService
         try {
             $about = $this->service->about->get(['fields' => 'storageQuota']);
             $quota = $about->getStorageQuota();
-            
+
             return [
                 'total' => $quota->getLimit(),
                 'used' => $quota->getUsage(),
@@ -180,7 +188,7 @@ class GoogleDriveService
     public function uploadFile(string $filePath, string $fileName, ?string $parentFolderId = null): ?array
     {
         try {
-            $fileMetadata = new \Google_Service_Drive_DriveFile([
+            $fileMetadata = new DriveFile([
                 'name' => $fileName,
             ]);
 
@@ -286,7 +294,7 @@ class GoogleDriveService
     public function createFolder(string $folderName, ?string $parentFolderId = null): ?array
     {
         try {
-            $fileMetadata = new \Google_Service_Drive_DriveFile([
+            $fileMetadata = new DriveFile([
                 'name' => $folderName,
                 'mimeType' => 'application/vnd.google-apps.folder',
             ]);
@@ -431,7 +439,7 @@ class GoogleDriveService
     public function shareFile(string $fileId, string $email, string $role = 'reader'): bool
     {
         try {
-            $permission = new \Google_Service_Drive_Permission([
+            $permission = new Permission([
                 'type' => 'user',
                 'role' => $role,
                 'emailAddress' => $email,
