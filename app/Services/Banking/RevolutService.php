@@ -4,11 +4,9 @@ namespace App\Services\Banking;
 
 use App\Models\BankAccount;
 use App\Models\Transaction;
-use App\Models\User;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
-use Exception;
+use Illuminate\Support\Facades\Log;
 
 class RevolutService
 {
@@ -18,39 +16,42 @@ class RevolutService
     private string $redirectUri;
     private int $timeout;
     private int $retryAttempts;
-    private ?string $accessToken = null;
 
     public function __construct()
     {
         $this->baseUrl = config('banking.revolut.base_url');
-        $this->clientId = config('banking.revolut.client_id');
-        $this->clientSecret = config('banking.revolut.client_secret');
-        $this->redirectUri = config('banking.revolut.redirect_uri');
+        $this->clientId = config('banking.revolut.client_id') ?? '';
+        $this->clientSecret = config('banking.revolut.client_secret') ?? '';
+        $this->redirectUri = config('banking.revolut.redirect_uri') ?? '';
         $this->timeout = config('banking.revolut.timeout', 30);
         $this->retryAttempts = config('banking.revolut.retry_attempts', 3);
     }
 
-    public function getAuthorizationUrl(string $state = null): string
+    /**
+     * Get authorization URL for OAuth 2.0 flow
+     */
+    public function getAuthorizationUrl(?string $state = null): string
     {
+        $state = $state ?? bin2hex(random_bytes(16));
+        
         $params = [
             'client_id' => $this->clientId,
             'redirect_uri' => $this->redirectUri,
             'response_type' => 'code',
-            'scope' => 'read',
+            'scope' => 'read:accounts read:transactions',
+            'state' => $state,
         ];
-
-        if ($state) {
-            $params['state'] = $state;
-        }
 
         return $this->baseUrl . '/oauth/authorize?' . http_build_query($params);
     }
 
-    public function exchangeCodeForToken(string $code): bool
+    /**
+     * Exchange authorization code for access token
+     */
+    public function exchangeCodeForToken(string $code): ?array
     {
         try {
             $response = Http::timeout($this->timeout)
-                ->retry($this->retryAttempts, 1000)
                 ->post($this->baseUrl . '/oauth/token', [
                     'client_id' => $this->clientId,
                     'client_secret' => $this->clientSecret,
@@ -61,40 +62,42 @@ class RevolutService
 
             if ($response->successful()) {
                 $tokenData = $response->json();
-                $this->accessToken = $tokenData['access_token'];
                 
-                // Cache token
-                Cache::put('revolut_access_token', $this->accessToken, 3600); // 1 hour
-                Cache::put('revolut_refresh_token', $tokenData['refresh_token'], 30 * 24 * 3600); // 30 days
+                // Cache tokens
+                Cache::put('revolut_access_token', $tokenData['access_token'], $tokenData['expires_in'] - 60);
+                Cache::put('revolut_refresh_token', $tokenData['refresh_token'], 86400 * 30); // 30 days
                 
-                return true;
+                return $tokenData;
             }
 
             Log::error('Revolut token exchange failed', [
-                'response' => $response->body(),
                 'status' => $response->status(),
+                'response' => $response->body()
             ]);
 
-            return false;
-        } catch (Exception $e) {
-            Log::error('Revolut token exchange error', [
-                'error' => $e->getMessage(),
+            return null;
+
+        } catch (\Exception $e) {
+            Log::error('Revolut token exchange exception', [
+                'error' => $e->getMessage()
             ]);
-            return false;
+            return null;
         }
     }
 
-    public function refreshToken(): bool
+    /**
+     * Refresh access token using refresh token
+     */
+    public function refreshToken(): ?array
     {
         $refreshToken = Cache::get('revolut_refresh_token');
         
         if (!$refreshToken) {
-            return false;
+            return null;
         }
 
         try {
             $response = Http::timeout($this->timeout)
-                ->retry($this->retryAttempts, 1000)
                 ->post($this->baseUrl . '/oauth/token', [
                     'client_id' => $this->clientId,
                     'client_secret' => $this->clientSecret,
@@ -104,56 +107,87 @@ class RevolutService
 
             if ($response->successful()) {
                 $tokenData = $response->json();
-                $this->accessToken = $tokenData['access_token'];
                 
-                Cache::put('revolut_access_token', $this->accessToken, 3600);
-                Cache::put('revolut_refresh_token', $tokenData['refresh_token'], 30 * 24 * 3600);
+                // Cache new tokens
+                Cache::put('revolut_access_token', $tokenData['access_token'], $tokenData['expires_in'] - 60);
+                Cache::put('revolut_refresh_token', $tokenData['refresh_token'], 86400 * 30);
                 
-                return true;
+                return $tokenData;
             }
 
-            return false;
-        } catch (Exception $e) {
-            Log::error('Revolut token refresh error', [
-                'error' => $e->getMessage(),
+            Log::error('Revolut token refresh failed', [
+                'status' => $response->status(),
+                'response' => $response->body()
             ]);
-            return false;
+
+            return null;
+
+        } catch (\Exception $e) {
+            Log::error('Revolut token refresh exception', [
+                'error' => $e->getMessage()
+            ]);
+            return null;
         }
     }
 
+    /**
+     * Get access token (from cache or refresh)
+     */
+    private function getAccessToken(): ?string
+    {
+        $accessToken = Cache::get('revolut_access_token');
+        
+        if (!$accessToken) {
+            $refreshed = $this->refreshToken();
+            $accessToken = $refreshed['access_token'] ?? null;
+        }
+        
+        return $accessToken;
+    }
+
+    /**
+     * Get user accounts
+     */
     public function getAccounts(): array
     {
-        if (!$this->ensureAuthenticated()) {
+        $token = $this->getAccessToken();
+        
+        if (!$token) {
             return [];
         }
 
         try {
-            $response = Http::withToken($this->accessToken)
+            $response = Http::withToken($token)
                 ->timeout($this->timeout)
-                ->retry($this->retryAttempts, 1000)
                 ->get($this->baseUrl . '/accounts');
 
             if ($response->successful()) {
-                return $response->json();
+                return $response->json('accounts', []);
             }
 
-            Log::error('Failed to fetch Revolut accounts', [
-                'response' => $response->body(),
+            Log::error('Revolut get accounts failed', [
                 'status' => $response->status(),
+                'response' => $response->body()
             ]);
 
             return [];
-        } catch (Exception $e) {
-            Log::error('Revolut accounts error', [
-                'error' => $e->getMessage(),
+
+        } catch (\Exception $e) {
+            Log::error('Revolut get accounts exception', [
+                'error' => $e->getMessage()
             ]);
             return [];
         }
     }
 
-    public function getTransactions(string $accountId, string $fromDate = null, string $toDate = null): array
+    /**
+     * Get account transactions
+     */
+    public function getTransactions(string $accountId, ?string $fromDate = null, ?string $toDate = null): array
     {
-        if (!$this->ensureAuthenticated()) {
+        $token = $this->getAccessToken();
+        
+        if (!$token) {
             return [];
         }
 
@@ -166,237 +200,268 @@ class RevolutService
         }
 
         try {
-            $response = Http::withToken($this->accessToken)
+            $response = Http::withToken($token)
                 ->timeout($this->timeout)
-                ->retry($this->retryAttempts, 1000)
                 ->get($this->baseUrl . "/accounts/{$accountId}/transactions", $params);
+
+            if ($response->successful()) {
+                return $response->json('transactions', []);
+            }
+
+            Log::error('Revolut get transactions failed', [
+                'account_id' => $accountId,
+                'status' => $response->status(),
+                'response' => $response->body()
+            ]);
+
+            return [];
+
+        } catch (\Exception $e) {
+            Log::error('Revolut get transactions exception', [
+                'account_id' => $accountId,
+                'error' => $e->getMessage()
+            ]);
+            return [];
+        }
+    }
+
+    /**
+     * Get account details
+     */
+    public function getAccount(string $accountId): ?array
+    {
+        $token = $this->getAccessToken();
+        
+        if (!$token) {
+            return null;
+        }
+
+        try {
+            $response = Http::withToken($token)
+                ->timeout($this->timeout)
+                ->get($this->baseUrl . "/accounts/{$accountId}");
 
             if ($response->successful()) {
                 return $response->json();
             }
 
-            Log::error('Failed to fetch Revolut transactions', [
+            Log::error('Revolut get account failed', [
                 'account_id' => $accountId,
-                'response' => $response->body(),
                 'status' => $response->status(),
+                'response' => $response->body()
             ]);
 
-            return [];
-        } catch (Exception $e) {
-            Log::error('Revolut transactions error', [
-                'error' => $e->getMessage(),
+            return null;
+
+        } catch (\Exception $e) {
+            Log::error('Revolut get account exception', [
                 'account_id' => $accountId,
+                'error' => $e->getMessage()
             ]);
-            return [];
+            return null;
         }
     }
 
-    public function getAccountBalance(string $accountId): float
+    /**
+     * Sync account with local database
+     */
+    public function syncAccount($account): array
     {
-        if (!$this->ensureAuthenticated()) {
-            return 0.0;
-        }
+        $accountId = $account->provider_account_id;
+        $transactions = $this->getTransactions($accountId);
+        
+        $importedCount = 0;
+        $errors = [];
 
-        try {
-            $response = Http::withToken($this->accessToken)
-                ->timeout($this->timeout)
-                ->retry($this->retryAttempts, 1000)
-                ->get($this->baseUrl . "/accounts/{$accountId}/balance");
-
-            if ($response->successful()) {
-                $balanceData = $response->json();
-                return (float) ($balanceData['balance'] ?? 0);
-            }
-
-            return 0.0;
-        } catch (Exception $e) {
-            Log::error('Failed to get Revolut account balance', [
-                'account_id' => $accountId,
-                'error' => $e->getMessage(),
-            ]);
-            return 0.0;
-        }
-    }
-
-    public function syncAccount(BankAccount $account): bool
-    {
-        try {
-            $transactions = $this->getTransactions(
-                $account->provider_account_id,
-                now()->subDays(30)->format('Y-m-d'),
-                now()->format('Y-m-d')
-            );
-
-            $importedCount = 0;
-            foreach ($transactions as $transactionData) {
-                if ($this->importTransaction($account, $transactionData)) {
+        foreach ($transactions as $transactionData) {
+            try {
+                $imported = $this->importTransaction($account, $transactionData);
+                if ($imported) {
                     $importedCount++;
                 }
+            } catch (\Exception $e) {
+                $errors[] = [
+                    'transaction_id' => $transactionData['id'] ?? 'unknown',
+                    'error' => $e->getMessage()
+                ];
             }
-
-            $account->update([
-                'last_sync_at' => now(),
-                'balance' => $this->getAccountBalance($account->provider_account_id),
-            ]);
-
-            Log::info('Revolut account sync completed', [
-                'account_id' => $account->id,
-                'imported_transactions' => $importedCount,
-            ]);
-
-            return true;
-        } catch (Exception $e) {
-            Log::error('Revolut account sync failed', [
-                'account_id' => $account->id,
-                'error' => $e->getMessage(),
-            ]);
-            return false;
-        }
-    }
-
-    private function ensureAuthenticated(): bool
-    {
-        if ($this->accessToken) {
-            return true;
         }
 
-        // Try to get from cache
-        $cachedToken = Cache::get('revolut_access_token');
-        if ($cachedToken) {
-            $this->accessToken = $cachedToken;
-            return true;
-        }
-
-        // Try to refresh token
-        return $this->refreshToken();
+        return [
+            'imported_count' => $importedCount,
+            'total_count' => count($transactions),
+            'errors' => $errors
+        ];
     }
 
-    private function importTransaction(BankAccount $account, array $transactionData): bool
+    /**
+     * Import single transaction
+     */
+    public function importTransaction($account, array $transactionData): bool
     {
-        try {
-            $existingTransaction = Transaction::where('external_id', $transactionData['id'])
-                ->where('bank_account_id', $account->id)
-                ->first();
-
-            if ($existingTransaction) {
-                return false; // Already imported
-            }
-
-            Transaction::create([
-                'user_id' => $account->user_id,
-                'bank_account_id' => $account->id,
-                'external_id' => $transactionData['id'],
-                'description' => $transactionData['description'] ?? 'Unknown',
-                'amount' => $transactionData['amount'] ?? 0,
-                'currency' => $transactionData['currency'] ?? 'EUR',
-                'transaction_date' => $transactionData['created_at'] ?? now(),
-                'type' => ($transactionData['amount'] ?? 0) >= 0 ? 'credit' : 'debit',
-                'status' => 'completed',
-                'merchant_name' => $transactionData['merchant'] ?? null,
-                'reference' => $transactionData['reference'] ?? null,
-            ]);
-
-            return true;
-        } catch (Exception $e) {
-            Log::error('Failed to import Revolut transaction', [
-                'transaction_data' => $transactionData,
-                'error' => $e->getMessage(),
-            ]);
-            return false;
-        }
-    }
-
-    public function getWebhookSecret(): string
-    {
-        return config('banking.webhooks.secret', '');
-    }
-
-    public function verifyWebhookSignature(string $payload, string $signature): bool
-    {
-        $expectedSignature = hash_hmac('sha256', $payload, $this->getWebhookSecret());
-        return hash_equals($expectedSignature, $signature);
-    }
-
-    public function processWebhook(array $data): bool
-    {
-        try {
-            $eventType = $data['event'] ?? '';
-            
-            switch ($eventType) {
-                case 'transaction.created':
-                case 'transaction.updated':
-                    return $this->processTransactionWebhook($data);
-                    
-                case 'account.updated':
-                    return $this->processAccountWebhook($data);
-                    
-                default:
-                    Log::info('Unhandled Revolut webhook event', [
-                        'event' => $eventType,
-                        'data' => $data,
-                    ]);
-                    return true;
-            }
-        } catch (Exception $e) {
-            Log::error('Revolut webhook processing error', [
-                'error' => $e->getMessage(),
-                'data' => $data,
-            ]);
-            return false;
-        }
-    }
-
-    private function processTransactionWebhook(array $data): bool
-    {
-        // Find account by provider_account_id
-        $account = BankAccount::where('provider', 'revolut')
-            ->where('provider_account_id', $data['account_id'] ?? '')
+        // Check if transaction already exists
+        $existingTransaction = Transaction::where('external_id', $transactionData['id'])
+            ->where('bank_account_id', $account->id)
             ->first();
 
-        if (!$account) {
-            return false;
+        if ($existingTransaction) {
+            return false; // Already imported
         }
 
-        // Import the transaction
-        return $this->importTransaction($account, $data['transaction'] ?? []);
-    }
-
-    private function processAccountWebhook(array $data): bool
-    {
-        $account = BankAccount::where('provider', 'revolut')
-            ->where('provider_account_id', $data['account_id'] ?? '')
-            ->first();
-
-        if (!$account) {
-            return false;
-        }
-
-        // Update account balance
-        $account->update([
-            'balance' => $this->getAccountBalance($account->provider_account_id),
+        // Create new transaction
+        $transaction = Transaction::create([
+            'user_id' => $account->user_id,
+            'bank_account_id' => $account->id,
+            'external_id' => $transactionData['id'],
+            'provider' => 'revolut',
+            'type' => $transactionData['type'] === 'credit' ? 'credit' : 'debit',
+            'amount' => abs($transactionData['amount']),
+            'currency' => $transactionData['currency'],
+            'description' => $transactionData['description'] ?? '',
+            'merchant_name' => $transactionData['merchant'] ?? null,
+            'transaction_date' => $transactionData['created_at'],
+            'status' => $transactionData['state'],
+            'reference' => $transactionData['reference'] ?? null,
+            'balance_after' => $transactionData['balance'] ?? null,
+            'metadata' => [
+                'revolut_id' => $transactionData['id'],
+                'category' => $transactionData['category'] ?? null,
+                'counterparty' => $transactionData['counterparty'] ?? null,
+            ]
         ]);
 
         return true;
     }
 
     /**
-     * Testuje połączenie z Revolut API
+     * Process webhook from Revolut
+     */
+    public function processWebhook(array $data): bool
+    {
+        try {
+            $eventType = $data['type'] ?? '';
+            
+            switch ($eventType) {
+                case 'TransactionCreated':
+                case 'TransactionUpdated':
+                    return $this->processTransactionWebhook($data);
+                    
+                case 'AccountCreated':
+                case 'AccountUpdated':
+                    return $this->processAccountWebhook($data);
+                    
+                default:
+                    Log::info('Revolut webhook received', [
+                        'type' => $eventType,
+                        'data' => $data
+                    ]);
+                    return true;
+            }
+
+        } catch (\Exception $e) {
+            Log::error('Revolut webhook processing failed', [
+                'error' => $e->getMessage(),
+                'data' => $data
+            ]);
+            return false;
+        }
+    }
+
+    /**
+     * Process transaction webhook
+     */
+    private function processTransactionWebhook(array $data): bool
+    {
+        $transactionData = $data['data'] ?? [];
+        $accountId = $transactionData['account_id'] ?? null;
+        
+        if (!$accountId) {
+            return false;
+        }
+
+        // Find account
+        $account = BankAccount::where('provider_account_id', $accountId)
+            ->where('provider', 'revolut')
+            ->first();
+
+        if (!$account) {
+            Log::warning('Revolut webhook: Account not found', [
+                'account_id' => $accountId
+            ]);
+            return false;
+        }
+
+        // Import transaction
+        return $this->importTransaction($account, $transactionData);
+    }
+
+    /**
+     * Process account webhook
+     */
+    private function processAccountWebhook(array $data): bool
+    {
+        $accountData = $data['data'] ?? [];
+        $accountId = $accountData['id'] ?? null;
+        
+        if (!$accountId) {
+            return false;
+        }
+
+        // Find and update account
+        $account = BankAccount::where('provider_account_id', $accountId)
+            ->where('provider', 'revolut')
+            ->first();
+
+        if ($account) {
+            $account->update([
+                'name' => $accountData['name'] ?? $account->name,
+                'balance' => $accountData['balance'] ?? $account->balance,
+                'status' => $accountData['state'] ?? $account->status,
+                'last_sync_at' => now(),
+            ]);
+        }
+
+        return true;
+    }
+
+    /**
+     * Verify webhook signature
+     */
+    public function verifyWebhookSignature(string $payload, string $signature): bool
+    {
+        $secret = config('banking.revolut.webhook_secret');
+        
+        if (!$secret) {
+            Log::warning('Revolut webhook secret not configured');
+            return false;
+        }
+
+        $expectedSignature = hash_hmac('sha256', $payload, $secret);
+        
+        return hash_equals($expectedSignature, $signature);
+    }
+
+    /**
+     * Test connection to Revolut API
      */
     public function testConnection(): bool
     {
         try {
-            if (!$this->ensureAuthenticated()) {
+            $token = $this->getAccessToken();
+            
+            if (!$token) {
                 return false;
             }
 
-            $response = Http::withToken($this->accessToken)
+            $response = Http::withToken($token)
                 ->timeout($this->timeout)
                 ->get($this->baseUrl . '/accounts');
 
             return $response->successful();
-        } catch (Exception $e) {
+
+        } catch (\Exception $e) {
             Log::error('Revolut connection test failed', [
-                'error' => $e->getMessage(),
+                'error' => $e->getMessage()
             ]);
             return false;
         }

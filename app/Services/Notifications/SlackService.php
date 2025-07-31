@@ -2,11 +2,8 @@
 
 namespace App\Services\Notifications;
 
-use App\Models\Transaction;
-use App\Models\User;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Exception;
 
 class SlackService
 {
@@ -20,172 +17,187 @@ class SlackService
     {
         $this->webhookUrl = config('slack.webhook_url');
         $this->botToken = config('slack.bot_token');
-        $this->channels = config('slack.channels');
-        $this->notifications = config('slack.notifications');
-        $this->thresholds = config('slack.thresholds');
+        $this->channels = config('slack.channels', []);
+        $this->notifications = config('slack.notifications', []);
+        $this->thresholds = config('slack.thresholds', []);
     }
 
-    public function sendNotification(string $type, array $data = []): bool
+    /**
+     * Send notification to Slack
+     * 
+     * @param array<string, mixed> $data
+     * @return bool
+     */
+    public function sendNotification(array $data): bool
     {
-        if (!$this->notifications[$type] ?? false) {
-            return false;
-        }
-
-        try {
-            $message = $this->buildMessage($type, $data);
-            $channel = $this->getChannelForType($type);
-            
-            return $this->sendToSlack($channel, $message);
-        } catch (Exception $e) {
-            Log::error('Slack notification failed', [
-                'type' => $type,
-                'data' => $data,
-                'error' => $e->getMessage(),
-            ]);
-            return false;
-        }
-    }
-
-    public function notifyBudgetExceeded(User $user, string $category, float $amount, float $budget): bool
-    {
-        if (!$this->notifications['budget_exceeded']) {
-            return false;
-        }
-
-        $data = [
-            'user' => $user->name,
-            'category' => $category,
-            'amount' => number_format($amount, 2),
-            'budget' => number_format($budget, 2),
-            'percentage' => round(($amount / $budget) * 100, 1),
-        ];
-
-        return $this->sendNotification('budget_exceeded', $data);
-    }
-
-    public function notifyLargeTransaction(Transaction $transaction): bool
-    {
-        if (!$this->notifications['large_transactions']) {
-            return false;
-        }
-
-        $threshold = $this->thresholds['large_transaction_amount'];
+        $channel = $data['channel'] ?? 'general';
+        $message = $this->buildMessage($data);
         
-        if (abs($transaction->amount) < $threshold) {
-            return false;
-        }
-
-        $data = [
-            'user' => $transaction->user->name,
-            'amount' => $transaction->formatted_amount,
-            'description' => $transaction->description,
-            'date' => $transaction->transaction_date->format('Y-m-d'),
-            'category' => $transaction->category?->name ?? 'Nieprzypisana',
-        ];
-
-        return $this->sendNotification('large_transaction', $data);
+        return $this->sendToSlack($message, $channel);
     }
 
-    public function notifySyncCompleted(User $user, int $importedCount, string $provider): bool
+    /**
+     * Notify about budget exceeded
+     */
+    public function notifyBudgetExceeded(string $category, float $amount, float $limit): bool
     {
-        if (!$this->notifications['sync_completed']) {
+        if (!$this->notifications['budget_alerts'] ?? false) {
             return false;
         }
 
         $data = [
-            'user' => $user->name,
-            'count' => $importedCount,
-            'provider' => $provider,
-            'date' => now()->format('Y-m-d H:i'),
+            'type' => 'budget_alert',
+            'title' => '🚨 Przekroczono limit budżetu',
+            'category' => $category,
+            'amount' => $amount,
+            'limit' => $limit,
+            'channel' => $this->channels['alerts'] ?? 'general',
         ];
 
-        return $this->sendNotification('sync_completed', $data);
+        return $this->sendNotification($data);
     }
 
-    public function notifyReportGenerated(User $user, string $reportType, string $reportUrl = null): bool
+    /**
+     * Notify about large transaction
+     */
+    public function notifyLargeTransaction(float $amount, string $description): bool
     {
-        if (!$this->notifications['report_generated']) {
+        $threshold = $this->thresholds['large_transaction'] ?? 1000;
+        
+        if ($amount < $threshold) {
             return false;
         }
 
         $data = [
-            'user' => $user->name,
+            'type' => 'large_transaction',
+            'title' => '💰 Duża transakcja',
+            'amount' => $amount,
+            'description' => $description,
+            'channel' => $this->channels['transactions'] ?? 'general',
+        ];
+
+        return $this->sendNotification($data);
+    }
+
+    /**
+     * Notify about sync completion
+     */
+    public function notifySyncCompletion(int $accountCount, int $transactionCount): bool
+    {
+        if (!$this->notifications['sync_alerts'] ?? false) {
+            return false;
+        }
+
+        $data = [
+            'type' => 'sync_completion',
+            'title' => '✅ Synchronizacja zakończona',
+            'accounts' => $accountCount,
+            'transactions' => $transactionCount,
+            'channel' => $this->channels['sync'] ?? 'general',
+        ];
+
+        return $this->sendNotification($data);
+    }
+
+    /**
+     * Notify about report generation
+     */
+    public function notifyReportGenerated(string $reportType, string $reportUrl = null): bool
+    {
+        if (!$this->notifications['report_alerts'] ?? false) {
+            return false;
+        }
+
+        $data = [
+            'type' => 'report_generated',
+            'title' => '📊 Raport wygenerowany',
             'report_type' => $reportType,
             'report_url' => $reportUrl,
-            'date' => now()->format('Y-m-d H:i'),
+            'channel' => $this->channels['reports'] ?? 'general',
         ];
 
-        return $this->sendNotification('report_generated', $data);
+        return $this->sendNotification($data);
     }
 
-    public function notifyError(string $error, array $context = []): bool
+    /**
+     * Notify about error
+     */
+    public function notifyError(string $error, string $context = ''): bool
     {
-        if (!$this->notifications['error_alerts']) {
+        if (!$this->notifications['error_alerts'] ?? false) {
             return false;
         }
 
         $data = [
+            'type' => 'error',
+            'title' => '❌ Błąd aplikacji',
             'error' => $error,
             'context' => $context,
-            'date' => now()->format('Y-m-d H:i:s'),
+            'channel' => $this->channels['errors'] ?? 'general',
         ];
 
-        return $this->sendNotification('error_alert', $data);
+        return $this->sendNotification($data);
     }
 
-    private function buildMessage(string $type, array $data): array
+    /**
+     * Build Slack message
+     * 
+     * @param array<string, mixed> $data
+     * @return array<string, mixed>
+     */
+    private function buildMessage(array $data): array
     {
-        $templates = config('slack.message_templates');
-        $template = $templates[$type] ?? [];
-
-        $text = $template['text'] ?? '';
-        $color = $template['color'] ?? '#36a64f';
-
-        // Replace placeholders with actual data
-        foreach ($data as $key => $value) {
-            $text = str_replace(":{$key}", $value, $text);
-        }
-
-        return [
+        $type = $data['type'] ?? 'info';
+        $title = $data['title'] ?? 'Powiadomienie';
+        
+        $message = [
+            'text' => $title,
             'attachments' => [
                 [
-                    'color' => $color,
-                    'text' => $text,
-                    'fields' => $this->buildFields($type, $data),
-                    'footer' => 'Finances Analyzer',
+                    'color' => $this->getColorForType($type),
+                    'fields' => $this->buildFields($data),
+                    'footer' => 'Finances App',
                     'ts' => time(),
-                ],
-            ],
+                ]
+            ]
         ];
+
+        return $message;
     }
 
-    private function buildFields(string $type, array $data): array
+    /**
+     * Build fields for Slack message
+     * 
+     * @param array<string, mixed> $data
+     * @return array<int, array<string, string>>
+     */
+    private function buildFields(array $data): array
     {
         $fields = [];
 
-        switch ($type) {
-            case 'budget_exceeded':
+        switch ($data['type'] ?? 'info') {
+            case 'budget_alert':
                 $fields = [
                     [
                         'title' => 'Kategoria',
-                        'value' => $data['category'] ?? 'N/A',
-                        'short' => true,
+                        'value' => $data['category'] ?? 'Nieznana',
+                        'short' => true
                     ],
                     [
-                        'title' => 'Wydatki',
-                        'value' => ($data['amount'] ?? 0) . ' PLN',
-                        'short' => true,
+                        'title' => 'Wydano',
+                        'value' => number_format($data['amount'], 2) . ' PLN',
+                        'short' => true
                     ],
                     [
-                        'title' => 'Budżet',
-                        'value' => ($data['budget'] ?? 0) . ' PLN',
-                        'short' => true,
+                        'title' => 'Limit',
+                        'value' => number_format($data['limit'], 2) . ' PLN',
+                        'short' => true
                     ],
                     [
-                        'title' => 'Procent',
-                        'value' => ($data['percentage'] ?? 0) . '%',
-                        'short' => true,
-                    ],
+                        'title' => 'Przekroczenie',
+                        'value' => number_format($data['amount'] - $data['limit'], 2) . ' PLN',
+                        'short' => true
+                    ]
                 ];
                 break;
 
@@ -193,141 +205,140 @@ class SlackService
                 $fields = [
                     [
                         'title' => 'Kwota',
-                        'value' => $data['amount'] ?? 'N/A',
-                        'short' => true,
+                        'value' => number_format($data['amount'], 2) . ' PLN',
+                        'short' => true
                     ],
                     [
                         'title' => 'Opis',
-                        'value' => $data['description'] ?? 'N/A',
-                        'short' => true,
-                    ],
-                    [
-                        'title' => 'Data',
-                        'value' => $data['date'] ?? 'N/A',
-                        'short' => true,
-                    ],
-                    [
-                        'title' => 'Kategoria',
-                        'value' => $data['category'] ?? 'N/A',
-                        'short' => true,
-                    ],
+                        'value' => $data['description'] ?? 'Brak opisu',
+                        'short' => true
+                    ]
                 ];
                 break;
 
-            case 'sync_completed':
+            case 'sync_completion':
                 $fields = [
                     [
-                        'title' => 'Użytkownik',
-                        'value' => $data['user'] ?? 'N/A',
-                        'short' => true,
+                        'title' => 'Konta',
+                        'value' => $data['accounts'] ?? 0,
+                        'short' => true
                     ],
                     [
-                        'title' => 'Zaimportowane transakcje',
-                        'value' => $data['count'] ?? 0,
-                        'short' => true,
-                    ],
-                    [
-                        'title' => 'Dostawca',
-                        'value' => $data['provider'] ?? 'N/A',
-                        'short' => true,
-                    ],
-                    [
-                        'title' => 'Data',
-                        'value' => $data['date'] ?? 'N/A',
-                        'short' => true,
-                    ],
+                        'title' => 'Transakcje',
+                        'value' => $data['transactions'] ?? 0,
+                        'short' => true
+                    ]
                 ];
                 break;
 
             case 'report_generated':
                 $fields = [
                     [
-                        'title' => 'Użytkownik',
-                        'value' => $data['user'] ?? 'N/A',
-                        'short' => true,
-                    ],
-                    [
                         'title' => 'Typ raportu',
-                        'value' => $data['report_type'] ?? 'N/A',
-                        'short' => true,
-                    ],
-                    [
-                        'title' => 'Data',
-                        'value' => $data['date'] ?? 'N/A',
-                        'short' => true,
-                    ],
+                        'value' => $data['report_type'] ?? 'Nieznany',
+                        'short' => true
+                    ]
                 ];
+                
+                if ($data['report_url'] ?? null) {
+                    $fields[] = [
+                        'title' => 'Link',
+                        'value' => '<' . $data['report_url'] . '|Pobierz raport>',
+                        'short' => true
+                    ];
+                }
                 break;
 
-            case 'error_alert':
+            case 'error':
                 $fields = [
                     [
                         'title' => 'Błąd',
-                        'value' => $data['error'] ?? 'N/A',
-                        'short' => false,
-                    ],
-                    [
-                        'title' => 'Data',
-                        'value' => $data['date'] ?? 'N/A',
-                        'short' => true,
-                    ],
+                        'value' => $data['error'] ?? 'Nieznany błąd',
+                        'short' => false
+                    ]
                 ];
+                
+                if ($data['context'] ?? null) {
+                    $fields[] = [
+                        'title' => 'Kontekst',
+                        'value' => $data['context'],
+                        'short' => false
+                    ];
+                }
                 break;
+
+            default:
+                $fields = [
+                    [
+                        'title' => 'Wiadomość',
+                        'value' => $data['message'] ?? 'Brak wiadomości',
+                        'short' => false
+                    ]
+                ];
         }
 
         return $fields;
     }
 
-    private function getChannelForType(string $type): string
+    /**
+     * Get color for message type
+     */
+    private function getColorForType(string $type): string
     {
-        switch ($type) {
-            case 'budget_exceeded':
-            case 'large_transaction':
-                return $this->channels['alerts'];
-            case 'sync_completed':
-            case 'report_generated':
-                return $this->channels['notifications'];
-            case 'error_alert':
-                return $this->channels['alerts'];
-            default:
-                return $this->channels['notifications'];
-        }
+        return match ($type) {
+            'budget_alert' => '#ff0000',
+            'large_transaction' => '#ffa500',
+            'sync_completion' => '#00ff00',
+            'report_generated' => '#0000ff',
+            'error' => '#ff0000',
+            default => '#cccccc',
+        };
     }
 
-    private function sendToSlack(string $channel, array $message): bool
+    /**
+     * Send message to Slack
+     * 
+     * @param array<string, mixed> $message
+     * @return bool
+     */
+    private function sendToSlack(array $message, string $channel = 'general'): bool
     {
         try {
             if ($this->webhookUrl) {
-                // Using webhook
-                $response = Http::timeout(10)->post($this->webhookUrl, $message);
+                // Use webhook
+                $response = Http::post($this->webhookUrl, $message);
             } elseif ($this->botToken) {
-                // Using bot token
-                $message['channel'] = $channel;
-                $response = Http::withToken($this->botToken)
-                    ->timeout(10)
-                    ->post('https://slack.com/api/chat.postMessage', $message);
+                // Use bot token
+                $response = Http::withHeaders([
+                    'Authorization' => 'Bearer ' . $this->botToken,
+                    'Content-Type' => 'application/json'
+                ])->post('https://slack.com/api/chat.postMessage', [
+                    'channel' => $channel,
+                    'text' => $message['text'],
+                    'attachments' => $message['attachments'] ?? []
+                ]);
             } else {
-                Log::error('Slack configuration missing');
+                Log::warning('Slack notification failed: No webhook URL or bot token configured');
                 return false;
             }
 
             if ($response->successful()) {
-                Log::info('Slack notification sent', [
+                Log::info('Slack notification sent successfully', [
                     'channel' => $channel,
-                    'type' => $message['attachments'][0]['text'] ?? 'unknown',
+                    'type' => $message['attachments'][0]['fields'][0]['title'] ?? 'unknown'
                 ]);
                 return true;
+            } else {
+                Log::error('Slack notification failed', [
+                    'status' => $response->status(),
+                    'response' => $response->body()
+                ]);
+                return false;
             }
 
-            Log::error('Slack notification failed', [
-                'response' => $response->body(),
-                'status' => $response->status(),
-            ]);
-
-            return false;
-        } catch (Exception $e) {
-            Log::error('Slack notification error', [
-                'error' => $e->getMessage(),
+        } catch (\Exception $e) {
+            Log::error('Slack notification exception', [
+                'error' => $e->getMessage()
             ]);
             return false;
         }

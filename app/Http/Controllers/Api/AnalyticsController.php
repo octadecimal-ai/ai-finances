@@ -12,9 +12,13 @@ class AnalyticsController extends Controller
     public function index(Request $request): JsonResponse
     {
         $user = Auth::user();
-        
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        // Placeholder for analytics dashboard
         return response()->json([
-            'message' => 'Analytics endpoint',
+            'message' => 'Analytics dashboard endpoint',
             'user_id' => $user->id,
         ]);
     }
@@ -22,7 +26,11 @@ class AnalyticsController extends Controller
     public function statistics(Request $request): JsonResponse
     {
         $user = Auth::user();
-        
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        // Placeholder for statistics
         return response()->json([
             'message' => 'Statistics endpoint',
             'user_id' => $user->id,
@@ -32,9 +40,13 @@ class AnalyticsController extends Controller
     public function trends(Request $request): JsonResponse
     {
         $user = Auth::user();
-        
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        // Placeholder for trends analysis
         return response()->json([
-            'message' => 'Trends endpoint',
+            'message' => 'Trends analysis endpoint',
             'user_id' => $user->id,
         ]);
     }

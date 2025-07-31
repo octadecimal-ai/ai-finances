@@ -2,41 +2,32 @@
 
 namespace App\Services\Google;
 
-// @capstan-ignore-next-line
-// @psalm-suppress UndefinedClass
-
-use Google_Client;
-use Google_Service_Drive;
-use Google_Service_Drive_DriveFile;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Cache;
-use Exception;
 
 class GoogleDriveService
 {
-    /** @var Google_Client */
+    /** @var \Google_Client */
     private $client;
-    /** @var Google_Service_Drive */
+    
+    /** @var \Google_Service_Drive */
     private $service;
+    
     private string $applicationName;
-    private string $credentialsPath;
-    /** @var array<string> */
     private array $scopes;
+    private string $credentialsPath;
+    private string $tokenPath;
 
-    /**
-     * @throws Exception
-     */
     public function __construct()
     {
-        $this->applicationName = config('google.application_name', 'Finances Analyzer');
-        $this->credentialsPath = config('google.credentials_path');
+        $this->applicationName = config('google.application_name', 'Finances App');
         $this->scopes = config('google.scopes', [
             'https://www.googleapis.com/auth/drive',
             'https://www.googleapis.com/auth/drive.file',
-            'https://www.googleapis.com/auth/spreadsheets',
         ]);
-
+        $this->credentialsPath = config('google.credentials_path');
+        $this->tokenPath = storage_path('app/google/token.json');
+        
         $this->initializeClient();
     }
 
@@ -46,7 +37,7 @@ class GoogleDriveService
     private function initializeClient(): void
     {
         try {
-            $this->client = new Google_Client();
+            $this->client = new \Google_Client();
             $this->client->setApplicationName($this->applicationName);
             $this->client->setScopes($this->scopes);
             $this->client->setAuthConfig($this->credentialsPath);
@@ -54,32 +45,46 @@ class GoogleDriveService
             $this->client->setPrompt('select_account consent');
 
             // Load previously authorized token from a cache
-            $tokenArray = Cache::get('google_drive_token');
-            if ($tokenArray) {
-                $this->client->setAccessToken($tokenArray);
+            if (file_exists($this->tokenPath)) {
+                $tokenContent = file_get_contents($this->tokenPath);
+                if ($tokenContent !== false) {
+                    $accessToken = json_decode($tokenContent, true);
+                    if ($accessToken !== null) {
+                        $this->client->setAccessToken($accessToken);
+                    }
+                }
             }
 
             // If there is no previous token or it has expired
             if ($this->client->isAccessTokenExpired()) {
                 if ($this->client->getRefreshToken()) {
                     $this->client->fetchAccessTokenWithRefreshToken($this->client->getRefreshToken());
-                    Cache::put('google_drive_token', $this->client->getAccessToken(), 3600);
                 } else {
-                    throw new Exception('No refresh token available. Please authenticate first.');
+                    // Request authorization from the user
+                    $authUrl = $this->client->createAuthUrl();
+                    Log::info('Google Drive authorization required', ['auth_url' => $authUrl]);
+                    throw new \Exception('Google Drive authorization required. Please visit: ' . $authUrl);
                 }
+                
+                // Save the token to a file
+                if (!is_dir(dirname($this->tokenPath))) {
+                    mkdir(dirname($this->tokenPath), 0700, true);
+                }
+                file_put_contents($this->tokenPath, json_encode($this->client->getAccessToken()));
             }
 
-            $this->service = new Google_Service_Drive($this->client);
-        } catch (Exception $e) {
+            $this->service = new \Google_Service_Drive($this->client);
+
+        } catch (\Exception $e) {
             Log::error('Google Drive client initialization failed', [
-                'error' => $e->getMessage(),
+                'error' => $e->getMessage()
             ]);
             throw $e;
         }
     }
 
     /**
-     * Generuje URL autoryzacji
+     * Get authorization URL for OAuth 2.0 flow
      */
     public function getAuthorizationUrl(): string
     {
@@ -87,7 +92,7 @@ class GoogleDriveService
     }
 
     /**
-     * Wymienia kod autoryzacyjny na token
+     * Exchange authorization code for access token
      */
     public function exchangeCodeForToken(string $code): bool
     {
@@ -95,72 +100,84 @@ class GoogleDriveService
             $accessToken = $this->client->fetchAccessTokenWithAuthCode($code);
             $this->client->setAccessToken($accessToken);
 
-            // Cache token
-            Cache::put('google_drive_token', $accessToken, 3600);
+            // Save the token to a file
+            if (!is_dir(dirname($this->tokenPath))) {
+                mkdir(dirname($this->tokenPath), 0700, true);
+            }
+            file_put_contents($this->tokenPath, json_encode($this->client->getAccessToken()));
 
             return true;
-        } catch (Exception $e) {
+
+        } catch (\Exception $e) {
             Log::error('Google Drive token exchange failed', [
-                'error' => $e->getMessage(),
+                'error' => $e->getMessage()
             ]);
             return false;
         }
     }
 
     /**
-     * Pobiera plik z Google Drive
-     * @return array<string, mixed>|null
+     * Test connection to Google Drive API
      */
-    public function getFile(string $fileId): ?array
+    public function testConnection(): bool
     {
         try {
-            $file = $this->service->files->get($fileId, [
-                'fields' => 'id, name, mimeType, size, createdTime, modifiedTime, parents, webViewLink, webContentLink'
+            $about = $this->service->about->get(['fields' => 'user,storageQuota']);
+            return $about !== null;
+        } catch (\Exception $e) {
+            Log::error('Google Drive connection test failed', [
+                'error' => $e->getMessage()
             ]);
+            return false;
+        }
+    }
 
+    /**
+     * Get user info
+     */
+    public function getUserInfo(): ?array
+    {
+        try {
+            $about = $this->service->about->get(['fields' => 'user']);
             return [
-                'id' => $file->getId(),
-                'name' => $file->getName(),
-                'mimeType' => $file->getMimeType(),
-                'size' => $file->getSize(),
-                'createdTime' => $file->getCreatedTime(),
-                'modifiedTime' => $file->getModifiedTime(),
-                'webViewLink' => $file->getWebViewLink(),
-                'webContentLink' => $file->getWebContentLink(),
+                'id' => $about->getUser()->getId(),
+                'email' => $about->getUser()->getEmailAddress(),
+                'name' => $about->getUser()->getDisplayName(),
             ];
-        } catch (Exception $e) {
-            Log::error('Google Drive get file failed', [
-                'error' => $e->getMessage(),
-                'file_id' => $fileId,
+        } catch (\Exception $e) {
+            Log::error('Google Drive get user info failed', [
+                'error' => $e->getMessage()
             ]);
             return null;
         }
     }
 
     /**
-     * Pobiera zawartość pliku
+     * Get storage usage statistics
      */
-    public function downloadFile(string $fileId): ?string
+    public function getStorageUsage(): ?array
     {
         try {
-            $content = $this->service->files->get($fileId, [
-                'alt' => 'media'
-            ])->getBody()->getContents();
-
-            return $content;
-        } catch (Exception $e) {
-            Log::error('Google Drive download file failed', [
-                'error' => $e->getMessage(),
-                'file_id' => $fileId,
+            $about = $this->service->about->get(['fields' => 'storageQuota']);
+            $quota = $about->getStorageQuota();
+            
+            return [
+                'total' => $quota->getLimit(),
+                'used' => $quota->getUsage(),
+                'available' => $quota->getLimit() - $quota->getUsage(),
+            ];
+        } catch (\Exception $e) {
+            Log::error('Google Drive get storage usage failed', [
+                'error' => $e->getMessage()
             ]);
             return null;
         }
     }
 
     /**
-     * Uploaduje plik do Google Drive
+     * Upload file to Google Drive
      */
-    public function uploadFile(string $filePath, string $fileName, ?string $mimeType = null, ?string $parentFolderId = null): ?string
+    public function uploadFile(string $filePath, string $fileName, ?string $parentFolderId = null): ?array
     {
         try {
             $fileMetadata = new \Google_Service_Drive_DriveFile([
@@ -171,33 +188,102 @@ class GoogleDriveService
                 $fileMetadata->setParents([$parentFolderId]);
             }
 
-            if (!$mimeType) {
-                $mimeType = mime_content_type($filePath);
-            }
-
             $content = file_get_contents($filePath);
             $file = $this->service->files->create($fileMetadata, [
                 'data' => $content,
-                'mimeType' => $mimeType,
+                'mimeType' => mime_content_type($filePath),
                 'uploadType' => 'multipart',
-                'fields' => 'id'
+                'fields' => 'id,name,size,createdTime,modifiedTime,webViewLink'
             ]);
 
-            return $file->getId();
-        } catch (Exception $e) {
+            return [
+                'id' => $file->getId(),
+                'name' => $file->getName(),
+                'size' => $file->getSize(),
+                'created_time' => $file->getCreatedTime(),
+                'modified_time' => $file->getModifiedTime(),
+                'web_view_link' => $file->getWebViewLink(),
+            ];
+
+        } catch (\Exception $e) {
             Log::error('Google Drive upload file failed', [
-                'error' => $e->getMessage(),
                 'file_path' => $filePath,
                 'file_name' => $fileName,
+                'error' => $e->getMessage()
             ]);
             return null;
         }
     }
 
     /**
-     * Tworzy folder w Google Drive
+     * Download file from Google Drive
      */
-    public function createFolder(string $folderName, ?string $parentFolderId = null): ?string
+    public function downloadFile(string $fileId, string $destinationPath): bool
+    {
+        try {
+            $content = $this->service->files->get($fileId, [
+                'alt' => 'media'
+            ])->getBody()->getContents();
+
+            return file_put_contents($destinationPath, $content) !== false;
+
+        } catch (\Exception $e) {
+            Log::error('Google Drive download file failed', [
+                'file_id' => $fileId,
+                'destination_path' => $destinationPath,
+                'error' => $e->getMessage()
+            ]);
+            return false;
+        }
+    }
+
+    /**
+     * Delete file from Google Drive
+     */
+    public function deleteFile(string $fileId): bool
+    {
+        try {
+            $this->service->files->delete($fileId);
+            return true;
+
+        } catch (\Exception $e) {
+            Log::error('Google Drive delete file failed', [
+                'file_id' => $fileId,
+                'error' => $e->getMessage()
+            ]);
+            return false;
+        }
+    }
+
+    /**
+     * Update file in Google Drive
+     */
+    public function updateFile(string $fileId, string $filePath): bool
+    {
+        try {
+            $content = file_get_contents($filePath);
+            $this->service->files->update($fileId, null, [
+                'data' => $content,
+                'mimeType' => mime_content_type($filePath),
+                'uploadType' => 'multipart'
+            ]);
+
+            return true;
+
+        } catch (\Exception $e) {
+            Log::error('Google Drive update file failed', [
+                'file_id' => $fileId,
+                'file_path' => $filePath,
+                'error' => $e->getMessage()
+            ]);
+            return false;
+        }
+    }
+
+    /**
+     * Create folder in Google Drive
+     */
+    public function createFolder(string $folderName, ?string $parentFolderId = null): ?array
     {
         try {
             $fileMetadata = new \Google_Service_Drive_DriveFile([
@@ -210,256 +296,189 @@ class GoogleDriveService
             }
 
             $folder = $this->service->files->create($fileMetadata, [
-                'fields' => 'id'
+                'fields' => 'id,name,createdTime,webViewLink'
             ]);
 
-            return $folder->getId();
-        } catch (Exception $e) {
+            return [
+                'id' => $folder->getId(),
+                'name' => $folder->getName(),
+                'created_time' => $folder->getCreatedTime(),
+                'web_view_link' => $folder->getWebViewLink(),
+            ];
+
+        } catch (\Exception $e) {
             Log::error('Google Drive create folder failed', [
-                'error' => $e->getMessage(),
                 'folder_name' => $folderName,
+                'parent_folder_id' => $parentFolderId,
+                'error' => $e->getMessage()
             ]);
             return null;
         }
     }
 
     /**
-     * Usuwa plik z Google Drive
+     * List files in Google Drive
      */
-    public function deleteFile(string $fileId): bool
+    public function listFiles(?string $folderId = null, int $pageSize = 10): array
     {
         try {
-            $this->service->files->delete($fileId);
-            return true;
-        } catch (Exception $e) {
-            Log::error('Google Drive delete file failed', [
-                'error' => $e->getMessage(),
-                'file_id' => $fileId,
-            ]);
-            return false;
-        }
-    }
-
-    /**
-     * Aktualizuje plik w Google Drive
-     */
-    public function updateFile(string $fileId, string $filePath, ?string $mimeType = null): bool
-    {
-        try {
-            if (!$mimeType) {
-                $mimeType = mime_content_type($filePath);
+            $query = "trashed = false";
+            if ($folderId) {
+                $query .= " and '$folderId' in parents";
             }
-
-            $content = file_get_contents($filePath);
-            $this->service->files->update($fileId, null, [
-                'data' => $content,
-                'mimeType' => $mimeType,
-                'uploadType' => 'multipart',
-            ]);
-
-            return true;
-        } catch (Exception $e) {
-            Log::error('Google Drive update file failed', [
-                'error' => $e->getMessage(),
-                'file_id' => $fileId,
-                'file_path' => $filePath,
-            ]);
-            return false;
-        }
-    }
-
-    /**
-     * Pobiera pliki Excel z Google Drive
-     * @param array<string, string> $filters
-     * @return array<int, mixed>
-     */
-    public function getExcelFiles(array $filters = []): array
-    {
-        $excelMimeTypes = [
-            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
-            'application/vnd.ms-excel', // .xls
-            'application/vnd.google-apps.spreadsheet', // Google Sheets
-        ];
-
-        $filters['mimeType'] = implode(' or ', array_map(function($type) {
-            return "mimeType='$type'";
-        }, $excelMimeTypes));
-
-        return $this->listFiles($filters);
-    }
-
-    /**
-     * Pobiera listę plików z Google Drive
-     * @param array<string, string> $filters
-     * @return array<int, mixed>
-     */
-    public function listFiles(array $filters = []): array
-    {
-        try {
-            $query = $this->buildQuery($filters);
 
             $results = $this->service->files->listFiles([
-                'pageSize' => 50,
-                'fields' => 'nextPageToken, files(id, name, mimeType, size, createdTime, modifiedTime, parents)',
+                'pageSize' => $pageSize,
+                'fields' => 'nextPageToken, files(id, name, mimeType, size, createdTime, modifiedTime, webViewLink)',
                 'q' => $query,
+                'orderBy' => 'modifiedTime desc'
             ]);
 
-            return $results->getFiles();
-        } catch (Exception $e) {
+            $files = [];
+            foreach ($results->getFiles() as $file) {
+                $files[] = [
+                    'id' => $file->getId(),
+                    'name' => $file->getName(),
+                    'mime_type' => $file->getMimeType(),
+                    'size' => $file->getSize(),
+                    'created_time' => $file->getCreatedTime(),
+                    'modified_time' => $file->getModifiedTime(),
+                    'web_view_link' => $file->getWebViewLink(),
+                ];
+            }
+
+            return $files;
+
+        } catch (\Exception $e) {
             Log::error('Google Drive list files failed', [
-                'error' => $e->getMessage(),
-                'filters' => $filters,
+                'folder_id' => $folderId,
+                'error' => $e->getMessage()
             ]);
             return [];
         }
     }
 
     /**
-     * Buduje zapytanie do Google Drive API
-     * @param array<string, string> $filters
+     * Search files in Google Drive
      */
-    private function buildQuery(array $filters): string
-    {
-        $conditions = [];
-
-        foreach ($filters as $key => $value) {
-            switch ($key) {
-                case 'name':
-                case 'parents':
-                case 'mimeType':
-                    $conditions[] = $value;
-                    break;
-                case 'trashed':
-                    $conditions[] = "trashed=$value";
-                    break;
-                case 'modifiedTime':
-                    $conditions[] = "modifiedTime > '$value'";
-                    break;
-            }
-        }
-
-        return implode(' and ', $conditions);
-    }
-
-    /**
-     * Pobiera pliki CSV z Google Drive
-     * @param array<string, string> $filters
-     * @return array<int, mixed>
-     */
-    public function getCsvFiles(array $filters = []): array
-    {
-        $filters['mimeType'] = "mimeType='text/csv'";
-        return $this->listFiles($filters);
-    }
-
-    /**
-     * Pobiera pliki PDF z Google Drive
-     * @param array<string, string> $filters
-     * @return array<int, mixed>
-     */
-    public function getPdfFiles(array $filters = []): array
-    {
-        $filters['mimeType'] = "mimeType='application/pdf'";
-        return $this->listFiles($filters);
-    }
-
-    /**
-     * Wyszukuje pliki po nazwie
-     * @param array<string, string> $filters
-     * @return array<int, mixed>
-     */
-    public function searchFiles(string $query, array $filters = []): array
-    {
-        $filters['name'] = "name contains '$query'";
-        return $this->listFiles($filters);
-    }
-
-    /**
-     * Pobiera pliki z określonego folderu
-     * @param array<string, string> $filters
-     * @return array<int, mixed>
-     */
-    public function getFilesFromFolder(string $folderId, array $filters = []): array
-    {
-        $filters['parents'] = "'$folderId' in parents";
-        return $this->listFiles($filters);
-    }
-
-    /**
-     * Pobiera statystyki użycia
-     * @return array<string, mixed>
-     */
-    public function getUsageStats(): array
+    public function searchFiles(string $query, int $pageSize = 10): array
     {
         try {
-            $about = $this->service->about->get([
-                'fields' => 'storageQuota'
+            $results = $this->service->files->listFiles([
+                'pageSize' => $pageSize,
+                'fields' => 'nextPageToken, files(id, name, mimeType, size, createdTime, modifiedTime, webViewLink)',
+                'q' => "name contains '$query' and trashed = false",
+                'orderBy' => 'modifiedTime desc'
             ]);
 
-            $quota = $about->getStorageQuota();
+            $files = [];
+            foreach ($results->getFiles() as $file) {
+                $files[] = [
+                    'id' => $file->getId(),
+                    'name' => $file->getName(),
+                    'mime_type' => $file->getMimeType(),
+                    'size' => $file->getSize(),
+                    'created_time' => $file->getCreatedTime(),
+                    'modified_time' => $file->getModifiedTime(),
+                    'web_view_link' => $file->getWebViewLink(),
+                ];
+            }
+
+            return $files;
+
+        } catch (\Exception $e) {
+            Log::error('Google Drive search files failed', [
+                'query' => $query,
+                'error' => $e->getMessage()
+            ]);
+            return [];
+        }
+    }
+
+    /**
+     * Get file metadata
+     */
+    public function getFileMetadata(string $fileId): ?array
+    {
+        try {
+            $file = $this->service->files->get($fileId, [
+                'fields' => 'id,name,mimeType,size,createdTime,modifiedTime,webViewLink,parents'
+            ]);
 
             return [
-                'total' => $quota->getLimit(),
-                'used' => $quota->getUsage(),
-                'available' => $quota->getLimit() - $quota->getUsage(),
-                'usage_percentage' => round(($quota->getUsage() / $quota->getLimit()) * 100, 2),
+                'id' => $file->getId(),
+                'name' => $file->getName(),
+                'mime_type' => $file->getMimeType(),
+                'size' => $file->getSize(),
+                'created_time' => $file->getCreatedTime(),
+                'modified_time' => $file->getModifiedTime(),
+                'web_view_link' => $file->getWebViewLink(),
+                'parents' => $file->getParents(),
             ];
-        } catch (Exception $e) {
-            Log::error('Google Drive usage stats failed', [
-                'error' => $e->getMessage(),
+
+        } catch (\Exception $e) {
+            Log::error('Google Drive get file metadata failed', [
+                'file_id' => $fileId,
+                'error' => $e->getMessage()
             ]);
-            return [];
+            return null;
         }
     }
 
     /**
-     * Testuje połączenie z Google Drive
+     * Share file with specific permissions
      */
-    public function testConnection(): bool
+    public function shareFile(string $fileId, string $email, string $role = 'reader'): bool
     {
         try {
-            $this->service->about->get(['fields' => 'user']);
+            $permission = new \Google_Service_Drive_Permission([
+                'type' => 'user',
+                'role' => $role,
+                'emailAddress' => $email,
+            ]);
+
+            $this->service->permissions->create($fileId, $permission);
+
             return true;
-        } catch (Exception $e) {
-            Log::error('Google Drive connection test failed', [
-                'error' => $e->getMessage(),
+
+        } catch (\Exception $e) {
+            Log::error('Google Drive share file failed', [
+                'file_id' => $fileId,
+                'email' => $email,
+                'role' => $role,
+                'error' => $e->getMessage()
             ]);
             return false;
         }
     }
 
     /**
-     * Wyczyść cache tokenów
+     * Get file permissions
      */
-    public function clearTokenCache(): void
-    {
-        Cache::forget('google_drive_token');
-    }
-
-    /**
-     * Pobiera informacje o użytkowniku
-     * @return array<string, mixed>|null
-     */
-    public function getUserInfo(): ?array
+    public function getFilePermissions(string $fileId): array
     {
         try {
-            $about = $this->service->about->get([
-                'fields' => 'user'
-            ]);
+            $permissions = $this->service->permissions->listPermissions($fileId);
 
-            $user = $about->getUser();
+            $result = [];
+            foreach ($permissions->getPermissions() as $permission) {
+                $result[] = [
+                    'id' => $permission->getId(),
+                    'type' => $permission->getType(),
+                    'role' => $permission->getRole(),
+                    'email_address' => $permission->getEmailAddress(),
+                    'display_name' => $permission->getDisplayName(),
+                ];
+            }
 
-            return [
-                'id' => $user->getId(),
-                'email' => $user->getEmailAddress(),
-                'name' => $user->getDisplayName(),
-                'photo' => $user->getPhotoLink(),
-            ];
-        } catch (Exception $e) {
-            Log::error('Google Drive get user info failed', [
-                'error' => $e->getMessage(),
+            return $result;
+
+        } catch (\Exception $e) {
+            Log::error('Google Drive get file permissions failed', [
+                'file_id' => $fileId,
+                'error' => $e->getMessage()
             ]);
-            return null;
+            return [];
         }
     }
 }

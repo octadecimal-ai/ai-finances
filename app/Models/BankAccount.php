@@ -9,8 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
- * @template TFactory
- * @extends Model<TFactory>
+ * @extends Model<BankAccount>
  */
 class BankAccount extends Model
 {
@@ -18,41 +17,55 @@ class BankAccount extends Model
 
     protected $fillable = [
         'user_id',
-        'bank_name',
-        'account_name',
+        'provider',
+        'provider_account_id',
+        'name',
         'account_number',
-        'iban',
         'currency',
         'balance',
-        'last_sync_at',
-        'provider', // nordigen, revolut, etc.
-        'provider_account_id',
-        'is_active',
+        'status',
         'sync_enabled',
+        'last_sync_at',
+        'sync_frequency',
+        'settings',
     ];
 
     protected $casts = [
         'balance' => 'decimal:2',
-        'last_sync_at' => 'datetime',
-        'is_active' => 'boolean',
         'sync_enabled' => 'boolean',
+        'last_sync_at' => 'datetime',
+        'settings' => 'array',
     ];
 
+    /**
+     * @return BelongsTo<User, BankAccount>
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * @return HasMany<Transaction>
+     */
     public function transactions(): HasMany
     {
         return $this->hasMany(Transaction::class);
     }
 
+    /**
+     * @param Builder<BankAccount> $query
+     * @return Builder<BankAccount>
+     */
     public function scopeActive(Builder $query): Builder
     {
-        return $query->where('is_active', true);
+        return $query->where('status', 'active');
     }
 
+    /**
+     * @param Builder<BankAccount> $query
+     * @return Builder<BankAccount>
+     */
     public function scopeSyncEnabled(Builder $query): Builder
     {
         return $query->where('sync_enabled', true);

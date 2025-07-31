@@ -5,137 +5,83 @@ namespace App\Console\Commands;
 use App\Services\Banking\NordigenService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
 
 class TestNordigenService extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'test:nordigen {--clear-cache : Clear cached tokens}';
+    protected $signature = 'test:nordigen {--clear-cache : Clear cache before testing}';
+    protected $description = 'Test Nordigen API service';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Test NordigenService connection and basic functionality';
+    public function __construct(
+        private NordigenService $nordigenService
+    ) {
+        parent::__construct();
+    }
 
-    /**
-     * Execute the console command.
-     */
-    public function handle()
+    public function handle(): int
     {
-        $this->info('🧪 Testing NordigenService...');
-        $this->newLine();
-
-        // Clear cache if requested
         if ($this->option('clear-cache')) {
             Cache::forget('nordigen_access_token');
-            $this->info('🗑️  Cleared cached tokens');
-            $this->newLine();
+            $this->info('Cache cleared.');
         }
 
-        $nordigen = app(NordigenService::class);
+        $this->info('Testing Nordigen API Service...');
 
-        // Test 1: Authentication
-        $this->info('1️⃣  Testing authentication...');
-        $authenticated = $nordigen->authenticate();
-        
-        if ($authenticated) {
-            $this->info('✅ Authentication successful');
-        } else {
-            $this->error('❌ Authentication failed');
-            $this->error('Please check your NORDIGEN_SECRET_ID and NORDIGEN_SECRET_KEY in .env file');
-            return 1;
-        }
+        try {
+            // Test authentication
+            $this->info('1. Testing authentication...');
+            $token = $this->nordigenService->authenticate();
+            if ($token) {
+                $this->info('✓ Authentication successful');
+            } else {
+                $this->error('✗ Authentication failed');
+                return 1;
+            }
 
-        // Test 2: Get institutions
-        $this->newLine();
-        $this->info('2️⃣  Testing institutions retrieval...');
-        $institutions = $nordigen->getInstitutions('PL');
-        
-        if (!empty($institutions)) {
-            $this->info('✅ Found ' . count($institutions) . ' institutions');
-            
-            // Show first few institutions
-            $this->table(
-                ['ID', 'Name', 'BIC'],
-                array_slice($institutions, 0, 5)
-            );
-        } else {
-            $this->warn('⚠️  No institutions found');
-        }
+            // Test getting institutions
+            $this->info('2. Testing institutions retrieval...');
+            $institutions = $this->nordigenService->getInstitutions();
+            if (!empty($institutions)) {
+                $this->info('✓ Found ' . count($institutions) . ' institutions');
+                $this->table(['ID', 'Name', 'Country'], array_map(function ($inst) {
+                    return [$inst['id'], $inst['name'], $inst['country'] ?? 'N/A'];
+                }, array_slice($institutions, 0, 5)));
+            } else {
+                $this->warn('⚠ No institutions found');
+            }
 
-        // Test 3: Create requisition (if institution available)
-        if (!empty($institutions)) {
-            $this->newLine();
-            $this->info('3️⃣  Testing requisition creation...');
-            
-            $firstInstitution = $institutions[0];
-            $requisitionId = $nordigen->createRequisition(
-                $firstInstitution['id'],
-                'http://localhost:8000/banking/callback'
-            );
-            
-            if ($requisitionId) {
-                $this->info('✅ Requisition created: ' . $requisitionId);
-                
-                // Test 4: Get accounts from requisition
-                $this->newLine();
-                $this->info('4️⃣  Testing accounts retrieval...');
-                $accounts = $nordigen->getAccounts($requisitionId);
-                
-                if (!empty($accounts)) {
-                    $this->info('✅ Found ' . count($accounts) . ' accounts');
+            // Test creating requisition
+            $this->info('3. Testing requisition creation...');
+            $institutionId = $institutions[0]['id'] ?? null;
+            if ($institutionId) {
+                $requisition = $this->nordigenService->createRequisition($institutionId, 'http://localhost/callback');
+                if ($requisition) {
+                    $this->info('✓ Requisition created: ' . $requisition['id']);
+                    $this->info('  Link: ' . $requisition['link']);
                 } else {
-                    $this->warn('⚠️  No accounts found in requisition');
+                    $this->error('✗ Failed to create requisition');
                 }
             } else {
-                $this->error('❌ Failed to create requisition');
+                $this->warn('⚠ Skipping requisition test - no institution available');
             }
-        }
 
-        // Test 5: Cache status
-        $this->newLine();
-        $this->info('5️⃣  Checking cache status...');
-        $cachedToken = Cache::get('nordigen_access_token');
-        
-        if ($cachedToken) {
-            $this->info('✅ Token cached successfully');
-        } else {
-            $this->warn('⚠️  No token in cache');
-        }
+            // Test getting accounts
+            $this->info('4. Testing accounts retrieval...');
+            $accounts = $this->nordigenService->getAccounts();
+            if (!empty($accounts)) {
+                $this->info('✓ Found ' . count($accounts) . ' accounts');
+                $this->table(['ID', 'Name', 'Currency', 'Status'], array_map(function ($acc) {
+                    return [$acc['id'], $acc['name'], $acc['currency'], $acc['status']];
+                }, array_slice($accounts, 0, 5)));
+            } else {
+                $this->warn('⚠ No accounts found');
+            }
 
-        // Test 6: Configuration check
-        $this->newLine();
-        $this->info('6️⃣  Checking configuration...');
-        
-        $config = [
-            'Base URL' => config('banking.nordigen.base_url'),
-            'Timeout' => config('banking.nordigen.timeout'),
-            'Retry Attempts' => config('banking.nordigen.retry_attempts'),
-            'Secret ID' => config('banking.nordigen.secret_id') ? 'Set' : 'Not set',
-            'Secret Key' => config('banking.nordigen.secret_key') ? 'Set' : 'Not set',
-        ];
-        
-        $this->table(
-            ['Setting', 'Value'],
-            collect($config)->map(fn($value, $key) => [$key, $value])->toArray()
-        );
+            $this->info('✓ All tests completed successfully!');
+            return 0;
 
-        $this->newLine();
-        $this->info('🎉 NordigenService test completed!');
-        
-        if ($authenticated) {
-            $this->info('✅ Service is ready to use');
-        } else {
-            $this->error('❌ Service needs configuration');
+        } catch (\Exception $e) {
+            $this->error('✗ Test failed: ' . $e->getMessage());
             return 1;
         }
-
-        return 0;
     }
 }

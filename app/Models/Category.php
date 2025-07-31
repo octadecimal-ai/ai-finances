@@ -4,10 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Builder;
 
+/**
+ * @extends Model<Category>
+ */
 class Category extends Model
 {
     use HasFactory;
@@ -20,6 +23,7 @@ class Category extends Model
         'parent_id',
         'is_default',
         'is_active',
+        'sort_order',
     ];
 
     protected $casts = [
@@ -27,31 +31,52 @@ class Category extends Model
         'is_active' => 'boolean',
     ];
 
+    /**
+     * @return HasMany<Transaction>
+     */
     public function transactions(): HasMany
     {
         return $this->hasMany(Transaction::class);
     }
 
+    /**
+     * @return BelongsTo<Category, Category>
+     */
     public function parent(): BelongsTo
     {
         return $this->belongsTo(Category::class, 'parent_id');
     }
 
+    /**
+     * @return HasMany<Category>
+     */
     public function children(): HasMany
     {
         return $this->hasMany(Category::class, 'parent_id');
     }
 
+    /**
+     * @param Builder<Category> $query
+     * @return Builder<Category>
+     */
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);
     }
 
+    /**
+     * @param Builder<Category> $query
+     * @return Builder<Category>
+     */
     public function scopeDefault(Builder $query): Builder
     {
         return $query->where('is_default', true);
     }
 
+    /**
+     * @param Builder<Category> $query
+     * @return Builder<Category>
+     */
     public function scopeRoot(Builder $query): Builder
     {
         return $query->whereNull('parent_id');

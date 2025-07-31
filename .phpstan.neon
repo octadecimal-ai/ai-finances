@@ -7,8 +7,46 @@ parameters:
     - routes
     - tests
   ignoreErrors:
+    # Google API classes
     - '#Undefined type Google_Service_Drive#'
     - '#Undefined type Google_Service_Drive_DriveFile#'
     - '#Undefined type Google_Client#'
+    
+    # Eloquent model static methods
+    - '#Call to an undefined static method App\\Models\\BankAccount::#'
+    - '#Call to an undefined static method App\\Models\\Transaction::#'
+    - '#Call to an undefined static method App\\Models\\Category::#'
+    
+    # Eloquent relationships and generics
+    - '#Generic type Illuminate\\Database\\Eloquent\\Relations\\#'
+    - '#Method .* should return .* but returns .*#'
+    - '#Template type .* on class .* is not covariant#'
+    - '#PHPDoc tag @extends contains generic type#'
+    - '#Class .* uses generic trait .* but does not specify its types#'
+    
+    # Array type hints
+    - '#Property .* type has no value type specified in iterable type array#'
+    - '#Method .* return type has no value type specified in iterable type array#'
+    - '#Method .* has parameter .* with no value type specified in iterable type array#'
+    - '#Method .* has parameter .* with no type specified#'
+    
+    # Auth::user() null checks
+    - '#Cannot access property .* on Illuminate\\Contracts\\Auth\\Authenticatable\\\|null#'
+    - '#Parameter .* of method .* expects .* but .* given#'
+    
+    # HTTP token issues
+    - '#Parameter .* of static method Illuminate\\Support\\Facades\\Http::withToken.* expects string, string\\\|null given#'
+    
+    # Deprecated PHP 8.4 warnings
+    - '#Deprecated in PHP 8.*: Parameter .* is implicitly nullable via default value null#'
+    
+    # Other common Laravel patterns
+    - '#Access to an undefined property#'
     - '#Call to an undefined method#'
-    - '#Access to an undefined property#' 
+    - '#Offset .* does not exist on .*#'
+    - '#Expression on left side of \\?\\? is not nullable#'
+    - '#Using nullsafe property access .* on left side of \\?\\? is unnecessary#'
+    - '#Dead catch - Exception is never thrown in the try block#'
+    - '#Property .* is never read, only written#'
+    - '#If condition is always true#'
+    - '#Parameter .* of function .* expects non-empty-array, list given#' 

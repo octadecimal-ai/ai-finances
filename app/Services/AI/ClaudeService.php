@@ -3,15 +3,13 @@
 namespace App\Services\AI;
 
 use App\Models\Transaction;
+use App\Models\Category;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Cache;
-use Exception;
 
 class ClaudeService
 {
     private string $apiKey;
-    private string $baseUrl;
     private string $model;
     private int $maxTokens;
     private float $temperature;
@@ -19,276 +17,330 @@ class ClaudeService
     public function __construct()
     {
         $this->apiKey = config('claude.api_key');
-        $this->baseUrl = config('claude.base_url');
-        $this->model = config('claude.model');
-        $this->maxTokens = config('claude.max_tokens');
-        $this->temperature = config('claude.temperature');
+        $this->model = config('claude.model', 'claude-3-sonnet-20240229');
+        $this->maxTokens = config('claude.max_tokens', 4000);
+        $this->temperature = config('claude.temperature', 0.7);
     }
 
+    /**
+     * Analyze a transaction using Claude AI
+     * 
+     * @param Transaction $transaction
+     * @return array<string, mixed>
+     */
     public function analyzeTransaction(Transaction $transaction): array
     {
         if (!config('claude.features.transaction_analysis')) {
-            return [];
-        }
-
-        $cacheKey = "claude_analysis_{$transaction->id}";
-        
-        return Cache::remember($cacheKey, 3600, function () use ($transaction) {
-            try {
-                $prompt = $this->buildTransactionAnalysisPrompt($transaction);
-                
-                $response = $this->makeRequest($prompt, 'transaction_analysis');
-                
-                if ($response) {
-                    $transaction->update(['ai_analyzed' => true]);
-                    return $this->parseAnalysisResponse($response);
-                }
-                
-                return [];
-            } catch (Exception $e) {
-                Log::error('Claude transaction analysis failed', [
-                    'transaction_id' => $transaction->id,
-                    'error' => $e->getMessage(),
-                ]);
-                return [];
-            }
-        });
-    }
-
-    public function suggestCategory(Transaction $transaction): ?string
-    {
-        if (!config('claude.features.category_suggestion')) {
-            return null;
+            return ['enabled' => false];
         }
 
         try {
-            $prompt = $this->buildCategorySuggestionPrompt($transaction);
+            $prompt = $this->buildTransactionAnalysisPrompt($transaction);
             
-            $response = $this->makeRequest($prompt, 'category_suggestion');
+            $response = $this->makeApiCall($prompt);
+            
+            if ($response) {
+                $analysis = $this->parseAnalysisResponse($response);
+                $analysis['transaction_id'] = $transaction->id;
+                return $analysis;
+            }
+            
+            return ['error' => 'Failed to analyze transaction'];
+            
+        } catch (\Exception $e) {
+            Log::error('Claude transaction analysis failed', [
+                'transaction_id' => $transaction->id,
+                'error' => $e->getMessage()
+            ]);
+            
+            return ['error' => 'Analysis failed: ' . $e->getMessage()];
+        }
+    }
+
+    /**
+     * Suggest category for a transaction
+     * 
+     * @param Transaction $transaction
+     * @param \Illuminate\Database\Eloquent\Collection<int, Category> $categories
+     * @return array<string, mixed>
+     */
+    public function suggestCategory(Transaction $transaction, $categories): array
+    {
+        if (!config('claude.features.category_suggestion')) {
+            return ['enabled' => false];
+        }
+
+        try {
+            $prompt = $this->buildCategorySuggestionPrompt($transaction, $categories);
+            
+            $response = $this->makeApiCall($prompt);
             
             if ($response) {
                 return $this->parseCategorySuggestion($response);
             }
             
-            return null;
-        } catch (Exception $e) {
+            return ['error' => 'Failed to suggest category'];
+            
+        } catch (\Exception $e) {
             Log::error('Claude category suggestion failed', [
                 'transaction_id' => $transaction->id,
-                'error' => $e->getMessage(),
+                'error' => $e->getMessage()
             ]);
-            return null;
+            
+            return ['error' => 'Suggestion failed: ' . $e->getMessage()];
         }
     }
 
-    public function generateBudgetRecommendations(int $userId, array $spendingData): array
+    /**
+     * Generate budget recommendations
+     * 
+     * @param array<string, mixed> $spendingData
+     * @return array<string, mixed>
+     */
+    public function generateBudgetRecommendations(array $spendingData): array
     {
         if (!config('claude.features.budget_recommendations')) {
-            return [];
+            return ['enabled' => false];
         }
 
         try {
             $prompt = $this->buildBudgetAnalysisPrompt($spendingData);
             
-            $response = $this->makeRequest($prompt, 'budget_analysis');
+            $response = $this->makeApiCall($prompt);
             
             if ($response) {
                 return $this->parseBudgetRecommendations($response);
             }
             
-            return [];
-        } catch (Exception $e) {
+            return ['error' => 'Failed to generate budget recommendations'];
+            
+        } catch (\Exception $e) {
             Log::error('Claude budget recommendations failed', [
-                'user_id' => $userId,
-                'error' => $e->getMessage(),
+                'error' => $e->getMessage()
             ]);
-            return [];
+            
+            return ['error' => 'Recommendations failed: ' . $e->getMessage()];
         }
     }
 
-    public function generateFinancialInsights(int $userId, array $financialData): array
+    /**
+     * Generate financial insights
+     * 
+     * @param array<string, mixed> $financialData
+     * @return array<string, mixed>
+     */
+    public function generateFinancialInsights(array $financialData): array
     {
         if (!config('claude.features.financial_insights')) {
-            return [];
+            return ['enabled' => false];
         }
 
         try {
             $prompt = $this->buildFinancialInsightsPrompt($financialData);
             
-            $response = $this->makeRequest($prompt, 'budget_analysis');
+            $response = $this->makeApiCall($prompt);
             
             if ($response) {
                 return $this->parseFinancialInsights($response);
             }
             
-            return [];
-        } catch (Exception $e) {
+            return ['error' => 'Failed to generate financial insights'];
+            
+        } catch (\Exception $e) {
             Log::error('Claude financial insights failed', [
-                'user_id' => $userId,
-                'error' => $e->getMessage(),
+                'error' => $e->getMessage()
             ]);
-            return [];
+            
+            return ['error' => 'Insights failed: ' . $e->getMessage()];
         }
     }
 
-    private function makeRequest(string $prompt, string $promptType): ?string
+    /**
+     * Build prompt for transaction analysis
+     */
+    private function buildTransactionAnalysisPrompt(Transaction $transaction): string
     {
-        $config = config("claude.prompts.{$promptType}");
+        $category = $transaction->category?->name ?? 'Nieprzypisana';
         
+        return "Przeanalizuj następującą transakcję finansową i podaj szczegółowe informacje:
+
+Transakcja:
+- Kwota: {$transaction->amount} {$transaction->currency}
+- Typ: " . ($transaction->type === 'credit' ? 'Przychód' : 'Wydatek') . "
+- Opis: {$transaction->description}
+- Data: {$transaction->transaction_date}
+- Kategoria: {$category}
+- Sprzedawca: {$transaction->merchant_name}
+
+Przeanalizuj:
+1. Czy transakcja wygląda na normalną czy podejrzaną?
+2. Jakie mogą być możliwe kategorie dla tej transakcji?
+3. Czy są jakieś wzorce w tej transakcji?
+4. Rekomendacje dotyczące kategoryzacji
+
+Odpowiedz w formacie JSON z polami: analysis, suspicious, suggested_categories, patterns, recommendations";
+    }
+
+    /**
+     * Build prompt for category suggestion
+     */
+    private function buildCategorySuggestionPrompt(Transaction $transaction, $categories): string
+    {
+        $categoryList = $categories->map(fn($cat) => "{$cat->id}: {$cat->name}")->join(', ');
+        
+        return "Sugeruj najlepszą kategorię dla tej transakcji:
+
+Transakcja:
+- Kwota: {$transaction->amount} {$transaction->currency}
+- Opis: {$transaction->description}
+- Sprzedawca: {$transaction->merchant_name}
+
+Dostępne kategorie: {$categoryList}
+
+Wybierz najlepszą kategorię i podaj uzasadnienie w formacie JSON:
+{
+  \"category_id\": ID_kategorii,
+  \"confidence\": 0.95,
+  \"reasoning\": \"Uzasadnienie wyboru\"
+}";
+    }
+
+    /**
+     * Build prompt for budget analysis
+     * 
+     * @param array<string, mixed> $spendingData
+     */
+    private function buildBudgetAnalysisPrompt(array $spendingData): string
+    {
+        $data = json_encode($spendingData, JSON_PRETTY_PRINT);
+        
+        return "Przeanalizuj dane wydatków i wygeneruj rekomendacje budżetowe:
+
+Dane wydatków:
+{$data}
+
+Wygeneruj rekomendacje w formacie JSON z polami:
+- budget_recommendations: lista rekomendacji
+- spending_patterns: wzorce wydatków
+- savings_opportunities: możliwości oszczędności
+- risk_alerts: alerty ryzyka";
+    }
+
+    /**
+     * Build prompt for financial insights
+     * 
+     * @param array<string, mixed> $financialData
+     */
+    private function buildFinancialInsightsPrompt(array $financialData): string
+    {
+        $data = json_encode($financialData, JSON_PRETTY_PRINT);
+        
+        return "Przeanalizuj dane finansowe i wygeneruj szczegółowe wnioski:
+
+Dane finansowe:
+{$data}
+
+Wygeneruj wnioski w formacie JSON z polami:
+- key_insights: główne wnioski
+- trends: trendy
+- recommendations: rekomendacje
+- risk_factors: czynniki ryzyka";
+    }
+
+    /**
+     * Make API call to Claude
+     */
+    private function makeApiCall(string $prompt): ?string
+    {
         try {
             $response = Http::withHeaders([
                 'x-api-key' => $this->apiKey,
-                'anthropic-version' => '2023-06-01',
                 'content-type' => 'application/json',
-            ])->timeout(30)->post($this->baseUrl . '/v1/messages', [
+                'anthropic-version' => '2023-06-01'
+            ])->post('https://api.anthropic.com/v1/messages', [
                 'model' => $this->model,
-                'max_tokens' => $config['max_tokens'] ?? $this->maxTokens,
+                'max_tokens' => $this->maxTokens,
                 'temperature' => $this->temperature,
                 'messages' => [
                     [
-                        'role' => 'system',
-                        'content' => $config['system'],
-                    ],
-                    [
                         'role' => 'user',
-                        'content' => $prompt,
-                    ],
-                ],
+                        'content' => $prompt
+                    ]
+                ]
             ]);
 
             if ($response->successful()) {
                 return $response->json('content.0.text');
             }
 
-            Log::error('Claude API request failed', [
-                'response' => $response->body(),
+            Log::error('Claude API call failed', [
                 'status' => $response->status(),
+                'response' => $response->body()
             ]);
 
             return null;
-        } catch (Exception $e) {
-            Log::error('Claude API request error', [
-                'error' => $e->getMessage(),
+
+        } catch (\Exception $e) {
+            Log::error('Claude API call exception', [
+                'error' => $e->getMessage()
             ]);
             return null;
         }
     }
 
-    private function buildTransactionAnalysisPrompt(Transaction $transaction): string
-    {
-        return "Przeanalizuj następującą transakcję finansową:
-
-Opis: {$transaction->description}
-Kwota: {$transaction->formatted_amount}
-Data: {$transaction->transaction_date}
-Typ: " . ($transaction->isIncome() ? 'Przychód' : 'Wydatek') . "
-Kategoria: " . ($transaction->category?->name ?? 'Nieprzypisana') . "
-
-Proszę o:
-1. Analizę wzorca wydatków
-2. Sugestie kategorii
-3. Rekomendacje finansowe
-4. Czy to jest nietypowa transakcja?
-
-Odpowiedz w języku polskim w formacie JSON.";
-    }
-
-    private function buildCategorySuggestionPrompt(Transaction $transaction): string
-    {
-        return "Na podstawie opisu transakcji, zasugeruj najlepszą kategorię:
-
-Opis: {$transaction->description}
-Kwota: {$transaction->formatted_amount}
-Data: {$transaction->transaction_date}
-
-Dostępne kategorie: Jedzenie, Transport, Rozrywka, Zakupy, Rachunki, Zdrowie, Edukacja, Inne
-
-Odpowiedz tylko nazwą kategorii w języku polskim.";
-    }
-
-    private function buildBudgetAnalysisPrompt(array $spendingData): string
-    {
-        $monthlySpending = json_encode($spendingData, JSON_UNESCAPED_UNICODE);
-        
-        return "Przeanalizuj dane wydatków użytkownika i wygeneruj rekomendacje budżetowe:
-
-Dane wydatków: {$monthlySpending}
-
-Proszę o:
-1. Analizę wzorców wydatków
-2. Rekomendacje oszczędności
-3. Sugestie optymalizacji budżetu
-4. Alerty o potencjalnych problemach finansowych
-
-Odpowiedz w języku polskim w formacie JSON.";
-    }
-
-    private function buildFinancialInsightsPrompt(array $financialData): string
-    {
-        $data = json_encode($financialData, JSON_UNESCAPED_UNICODE);
-        
-        return "Przeanalizuj dane finansowe użytkownika i wygeneruj insights:
-
-Dane finansowe: {$data}
-
-Proszę o:
-1. Główne insights finansowe
-2. Trendy wydatków
-3. Rekomendacje inwestycyjne
-4. Prognozy finansowe
-
-Odpowiedz w języku polskim w formacie JSON.";
-    }
-
+    /**
+     * Parse analysis response
+     * 
+     * @return array<string, mixed>
+     */
     private function parseAnalysisResponse(string $response): array
     {
         try {
-            return json_decode($response, true) ?? [];
-        } catch (Exception $e) {
-            Log::error('Failed to parse Claude analysis response', [
-                'response' => $response,
-                'error' => $e->getMessage(),
-            ]);
-            return [];
+            return json_decode($response, true) ?: ['raw_response' => $response];
+        } catch (\Exception $e) {
+            return ['raw_response' => $response, 'parse_error' => $e->getMessage()];
         }
     }
 
-    private function parseCategorySuggestion(string $response): ?string
+    /**
+     * Parse category suggestion
+     * 
+     * @return array<string, mixed>
+     */
+    private function parseCategorySuggestion(string $response): array
     {
-        $response = trim($response);
-        $validCategories = ['Jedzenie', 'Transport', 'Rozrywka', 'Zakupy', 'Rachunki', 'Zdrowie', 'Edukacja', 'Inne'];
-        
-        foreach ($validCategories as $category) {
-            if (stripos($response, $category) !== false) {
-                return $category;
-            }
+        try {
+            return json_decode($response, true) ?: ['raw_response' => $response];
+        } catch (\Exception $e) {
+            return ['raw_response' => $response, 'parse_error' => $e->getMessage()];
         }
-        
-        return null;
     }
 
+    /**
+     * Parse budget recommendations
+     * 
+     * @return array<string, mixed>
+     */
     private function parseBudgetRecommendations(string $response): array
     {
         try {
-            return json_decode($response, true) ?? [];
-        } catch (Exception $e) {
-            Log::error('Failed to parse Claude budget recommendations', [
-                'response' => $response,
-                'error' => $e->getMessage(),
-            ]);
-            return [];
+            return json_decode($response, true) ?: ['raw_response' => $response];
+        } catch (\Exception $e) {
+            return ['raw_response' => $response, 'parse_error' => $e->getMessage()];
         }
     }
 
+    /**
+     * Parse financial insights
+     * 
+     * @return array<string, mixed>
+     */
     private function parseFinancialInsights(string $response): array
     {
         try {
-            return json_decode($response, true) ?? [];
-        } catch (Exception $e) {
-            Log::error('Failed to parse Claude financial insights', [
-                'response' => $response,
-                'error' => $e->getMessage(),
-            ]);
-            return [];
+            return json_decode($response, true) ?: ['raw_response' => $response];
+        } catch (\Exception $e) {
+            return ['raw_response' => $response, 'parse_error' => $e->getMessage()];
         }
     }
 } 
