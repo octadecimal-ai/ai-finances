@@ -19,7 +19,7 @@ class GoogleDriveService
     
     private string $applicationName;
     private array $scopes;
-    private string $credentialsPath;
+    private ?string $credentialsPath;
     private string $tokenPath;
 
     /**
@@ -27,13 +27,15 @@ class GoogleDriveService
      */
     public function __construct()
     {
-        $this->applicationName = config('google.application_name', 'Finances App');
-        $this->scopes = config('google.scopes', [
+        $this->applicationName = config('google.drive.application_name', 'Finances App');
+        $this->scopes = config('google.drive.scopes', [
             'https://www.googleapis.com/auth/drive',
             'https://www.googleapis.com/auth/drive.file',
         ]);
-        $this->credentialsPath = config('google.credentials_path');
-        $this->tokenPath = storage_path('app/google/token.json');
+        
+        // Użyj credentials z konfiguracji zamiast pliku
+        $this->credentialsPath = null; // Będziemy używać credentials z config
+        $this->tokenPath = storage_path('app/google_token.json');
 
         $this->initializeClient();
     }
@@ -48,37 +50,53 @@ class GoogleDriveService
             $this->client = new Client();
             $this->client->setApplicationName($this->applicationName);
             $this->client->setScopes($this->scopes);
-            $this->client->setAuthConfig($this->credentialsPath);
-            $this->client->setAccessType('offline');
-            $this->client->setPrompt('select_account consent');
+            
+            // Użyj credentials z konfiguracji
+            $credentials = config('google.credentials');
+            $credentialsType = config('google.credentials.type', 'service_account');
+            
+            if ($credentials && $credentialsType === 'service_account') {
+                // Service Account flow
+                $this->client->setAuthConfig($credentials);
+                
+                // For service account, we don't need to handle token refresh manually
+                // The client will handle it automatically
+            } else {
+                // OAuth flow
+                $this->client->setClientId(config('google.drive.client_id'));
+                $this->client->setClientSecret(config('google.drive.client_secret'));
+                $this->client->setRedirectUri(config('google.drive.redirect_uri'));
+                $this->client->setAccessType('offline');
+                $this->client->setPrompt('select_account consent');
 
-            // Load previously authorized token from a cache
-            if (file_exists($this->tokenPath)) {
-                $tokenContent = file_get_contents($this->tokenPath);
-                if ($tokenContent !== false) {
-                    $accessToken = json_decode($tokenContent, true);
-                    if ($accessToken !== null) {
-                        $this->client->setAccessToken($accessToken);
+                // Load previously authorized token from a cache
+                if (file_exists($this->tokenPath)) {
+                    $tokenContent = file_get_contents($this->tokenPath);
+                    if ($tokenContent !== false) {
+                        $accessToken = json_decode($tokenContent, true);
+                        if ($accessToken !== null) {
+                            $this->client->setAccessToken($accessToken);
+                        }
                     }
                 }
-            }
 
-            // If there is no previous token or it has expired
-            if ($this->client->isAccessTokenExpired()) {
-                if ($this->client->getRefreshToken()) {
-                    $this->client->fetchAccessTokenWithRefreshToken($this->client->getRefreshToken());
-                } else {
-                    // Request authorization from the user
-                    $authUrl = $this->client->createAuthUrl();
-                    Log::info('Google Drive authorization required', ['auth_url' => $authUrl]);
-                    throw new \Exception('Google Drive authorization required. Please visit: ' . $authUrl);
-                }
+                // If there is no previous token or it has expired
+                if ($this->client->isAccessTokenExpired()) {
+                    if ($this->client->getRefreshToken()) {
+                        $this->client->fetchAccessTokenWithRefreshToken($this->client->getRefreshToken());
+                    } else {
+                        // Request authorization from the user
+                        $authUrl = $this->client->createAuthUrl();
+                        Log::info('Google Drive authorization required', ['auth_url' => $authUrl]);
+                        throw new \Exception('Google Drive authorization required. Please visit: ' . $authUrl);
+                    }
 
-                // Save the token to a file
-                if (!is_dir(dirname($this->tokenPath))) {
-                    mkdir(dirname($this->tokenPath), 0700, true);
+                    // Save the token to a file
+                    if (!is_dir(dirname($this->tokenPath))) {
+                        mkdir(dirname($this->tokenPath), 0700, true);
+                    }
+                    file_put_contents($this->tokenPath, json_encode($this->client->getAccessToken()));
                 }
-                file_put_contents($this->tokenPath, json_encode($this->client->getAccessToken()));
             }
 
             $this->service = new Drive($this->client);
@@ -150,7 +168,7 @@ class GoogleDriveService
             $user = $about->getUser();
             
             return [
-                'id' => $user->getId() ?? null,
+                'id' => $user->getPermissionId() ?? null,
                 'email' => $user->getEmailAddress() ?? null,
                 'name' => $user->getDisplayName() ?? null,
             ];
@@ -199,12 +217,23 @@ class GoogleDriveService
             }
 
             $content = file_get_contents($filePath);
-            $file = $this->service->files->create($fileMetadata, [
+            
+            // Spróbuj użyć Shared Drive jeśli jest skonfigurowany
+            $sharedDriveId = config('google.drive.shared_drive_id');
+            $params = [
                 'data' => $content,
                 'mimeType' => mime_content_type($filePath),
                 'uploadType' => 'multipart',
                 'fields' => 'id,name,size,createdTime,modifiedTime,webViewLink'
-            ]);
+            ];
+            
+            if ($sharedDriveId) {
+                $params['supportsAllDrives'] = true;
+                $params['includeItemsFromAllDrives'] = true;
+                $params['corpora'] = 'allDrives';
+            }
+            
+            $file = $this->service->files->create($fileMetadata, $params);
 
             return [
                 'id' => $file->getId(),
@@ -231,12 +260,64 @@ class GoogleDriveService
     public function downloadFile(string $fileId, string $destinationPath): bool
     {
         try {
-            $response = $this->service->files->get($fileId, [
+            // Pobierz metadane pliku najpierw
+            $file = $this->service->files->get($fileId);
+            
+            // Sprawdź czy plik nie jest folderem
+            if ($file->getMimeType() === 'application/vnd.google-apps.folder') {
+                Log::error('Google Drive download file failed - cannot download folder', [
+                    'file_id' => $fileId,
+                    'mime_type' => $file->getMimeType()
+                ]);
+                return false;
+            }
+            
+            // Sprawdź czy plik nie jest Google Docs/Sheets/Slides
+            if (strpos($file->getMimeType(), 'application/vnd.google-apps') === 0) {
+                Log::error('Google Drive download file failed - cannot download Google Apps files directly', [
+                    'file_id' => $fileId,
+                    'mime_type' => $file->getMimeType()
+                ]);
+                return false;
+            }
+            
+            // Pobierz zawartość pliku
+            $content = $this->service->files->get($fileId, [
                 'alt' => 'media'
             ]);
-            $content = $response->getBody()->getContents();
 
-            return file_put_contents($destinationPath, $content) !== false;
+            // Sprawdź czy zawartość nie jest pusta
+            if (empty($content)) {
+                Log::error('Google Drive download file failed - empty content', [
+                    'file_id' => $fileId,
+                    'file_size' => $file->getSize()
+                ]);
+                return false;
+            }
+
+            // Zapisz do pliku
+            $result = file_put_contents($destinationPath, $content);
+            
+            if ($result === false) {
+                Log::error('Google Drive download file failed - cannot write to destination', [
+                    'file_id' => $fileId,
+                    'destination_path' => $destinationPath
+                ]);
+                return false;
+            }
+
+            // Sprawdź czy plik został zapisany poprawnie
+            if (!file_exists($destinationPath) || filesize($destinationPath) === 0) {
+                Log::error('Google Drive download file failed - file not written or empty', [
+                    'file_id' => $fileId,
+                    'destination_path' => $destinationPath,
+                    'file_exists' => file_exists($destinationPath),
+                    'file_size' => file_exists($destinationPath) ? filesize($destinationPath) : 'N/A'
+                ]);
+                return false;
+            }
+
+            return true;
 
         } catch (\Exception $e) {
             Log::error('Google Drive download file failed', [
