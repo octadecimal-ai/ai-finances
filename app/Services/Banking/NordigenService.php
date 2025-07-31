@@ -7,6 +7,7 @@ use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 use Exception;
 
 class NordigenService
@@ -15,18 +16,30 @@ class NordigenService
     private string $secretId;
     private string $secretKey;
     private ?string $accessToken = null;
+    private int $timeout;
+    private int $retryAttempts;
 
     public function __construct()
     {
         $this->baseUrl = config('banking.nordigen.base_url');
         $this->secretId = config('banking.nordigen.secret_id');
         $this->secretKey = config('banking.nordigen.secret_key');
+        $this->timeout = config('banking.nordigen.timeout', 30);
+        $this->retryAttempts = config('banking.nordigen.retry_attempts', 3);
     }
 
     public function authenticate(): bool
     {
+        // Check cache first
+        $cachedToken = Cache::get('nordigen_access_token');
+        if ($cachedToken) {
+            $this->accessToken = $cachedToken;
+            return true;
+        }
+
         try {
-            $response = Http::timeout(config('banking.nordigen.timeout'))
+            $response = Http::timeout($this->timeout)
+                ->retry($this->retryAttempts, 1000)
                 ->post($this->baseUrl . '/token/new/', [
                     'secret_id' => $this->secretId,
                     'secret_key' => $this->secretKey,
@@ -34,6 +47,10 @@ class NordigenService
 
             if ($response->successful()) {
                 $this->accessToken = $response->json('access');
+                
+                // Cache token for 23 hours (tokens expire in 24 hours)
+                Cache::put('nordigen_access_token', $this->accessToken, 23 * 60 * 60);
+                
                 return true;
             }
 
@@ -283,5 +300,85 @@ class NordigenService
             ]);
             return 0.0;
         }
+    }
+
+    /**
+     * Weryfikuje podpis webhook
+     */
+    public function verifyWebhookSignature(string $payload, string $signature): bool
+    {
+        $expectedSignature = hash_hmac('sha256', $payload, config('banking.webhooks.secret', ''));
+        return hash_equals($expectedSignature, $signature);
+    }
+
+    /**
+     * Przetwarza webhook z Nordigen
+     */
+    public function processWebhook(array $data): bool
+    {
+        try {
+            $eventType = $data['event'] ?? '';
+            
+            switch ($eventType) {
+                case 'transaction.created':
+                case 'transaction.updated':
+                    return $this->processTransactionWebhook($data);
+                    
+                case 'account.updated':
+                    return $this->processAccountWebhook($data);
+                    
+                default:
+                    Log::info('Unhandled Nordigen webhook event', [
+                        'event' => $eventType,
+                        'data' => $data,
+                    ]);
+                    return true;
+            }
+        } catch (Exception $e) {
+            Log::error('Nordigen webhook processing error', [
+                'error' => $e->getMessage(),
+                'data' => $data,
+            ]);
+            return false;
+        }
+    }
+
+    /**
+     * Przetwarza webhook transakcji
+     */
+    private function processTransactionWebhook(array $data): bool
+    {
+        // Find account by provider_account_id
+        $account = BankAccount::where('provider', 'nordigen')
+            ->where('provider_account_id', $data['account_id'] ?? '')
+            ->first();
+
+        if (!$account) {
+            return false;
+        }
+
+        // Import the transaction
+        return $this->importTransaction($account, $data['transaction'] ?? []);
+    }
+
+    /**
+     * Przetwarza webhook konta
+     */
+    private function processAccountWebhook(array $data): bool
+    {
+        $account = BankAccount::where('provider', 'nordigen')
+            ->where('provider_account_id', $data['account_id'] ?? '')
+            ->first();
+
+        if (!$account) {
+            return false;
+        }
+
+        // Update account balance
+        $account->update([
+            'balance' => $this->getAccountBalance($account->provider_account_id),
+        ]);
+
+        return true;
     }
 } 
