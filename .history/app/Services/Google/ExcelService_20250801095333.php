@@ -143,9 +143,7 @@ class ExcelService
             $success = $this->googleDriveService->updateFile($fileId, $tempPath);
 
             // Usuń tymczasowy plik
-            if (file_exists($tempPath)) {
-                unlink($tempPath);
-            }
+            unlink($tempPath);
 
             return $success;
         } catch (Exception $e) {

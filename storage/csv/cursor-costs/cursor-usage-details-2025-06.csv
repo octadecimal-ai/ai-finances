@@ -1,0 +1,872 @@
+Date,User,Kind,Max Mode,Model,Tokens,Cost ($)
+"2025-06-30T15:34:50.786Z","You","Included in Pro","No","claude-4-sonnet-thinking",42758,"Included"
+"2025-06-30T14:51:36.669Z","You","Included in Pro","No","claude-4-sonnet-thinking",165149,"Included"
+"2025-06-30T14:33:33.988Z","You","Included in Pro","No","claude-4-sonnet-thinking",274703,"Included"
+"2025-06-30T14:31:55.230Z","You","Included in Pro","No","claude-4-sonnet-thinking",211056,"Included"
+"2025-06-30T14:05:57.470Z","You","Included in Pro","No","claude-4-sonnet-thinking",130357,"Included"
+"2025-06-30T13:54:01.890Z","You","Included in Pro","No","claude-4-sonnet-thinking",1422097,"Included"
+"2025-06-30T13:20:51.212Z","You","Included in Pro","No","claude-4-sonnet-thinking",288370,"Included"
+"2025-06-30T13:18:17.849Z","You","Included in Pro","No","claude-4-sonnet-thinking",99707,"Included"
+"2025-06-30T13:06:14.550Z","You","Included in Pro","No","claude-4-sonnet-thinking",743122,"Included"
+"2025-06-30T12:43:44.867Z","You","Included in Pro","No","claude-4-sonnet-thinking",486971,"Included"
+"2025-06-30T11:35:33.773Z","You","Included in Pro","No","claude-4-sonnet-thinking",892300,"Included"
+"2025-06-30T11:34:09.112Z","You","Included in Pro","No","claude-4-sonnet-thinking",313883,"Included"
+"2025-06-30T11:26:18.307Z","You","Included in Pro","No","claude-4-sonnet-thinking",748368,"Included"
+"2025-06-30T11:21:58.587Z","You","Included in Pro","No","claude-4-sonnet-thinking",138614,"Included"
+"2025-06-30T11:13:29.592Z","You","Included in Pro","No","claude-4-sonnet-thinking",653920,"Included"
+"2025-06-30T10:51:50.635Z","You","Included in Pro","No","claude-4-sonnet-thinking",226310,"Included"
+"2025-06-30T10:21:20.302Z","You","Included in Pro","No","claude-4-sonnet-thinking",435093,"Included"
+"2025-06-30T09:54:40.299Z","You","Included in Pro","No","claude-4-sonnet-thinking",260672,"Included"
+"2025-06-30T09:10:51.636Z","You","Included in Pro","No","claude-4-sonnet-thinking",375683,"Included"
+"2025-06-30T09:05:30.523Z","You","Included in Pro","No","claude-4-sonnet-thinking",958025,"Included"
+"2025-06-27T15:43:43.319Z","You","Included in Pro","No","claude-4-sonnet-thinking",92410,"Included"
+"2025-06-27T15:33:45.888Z","You","Included in Pro","No","claude-4-sonnet-thinking",1358408,"Included"
+"2025-06-27T15:25:33.630Z","You","Included in Pro","No","claude-4-sonnet-thinking",1607823,"Included"
+"2025-06-27T15:17:08.505Z","You","Included in Pro","No","claude-4-sonnet-thinking",85672,"Included"
+"2025-06-27T15:15:19.610Z","You","Included in Pro","No","claude-4-sonnet-thinking",254733,"Included"
+"2025-06-27T14:53:35.447Z","You","Included in Pro","No","claude-4-sonnet-thinking",2157713,"Included"
+"2025-06-27T14:45:56.454Z","You","Included in Pro","No","claude-4-sonnet-thinking",908586,"Included"
+"2025-06-27T14:08:39.167Z","You","Included in Pro","No","claude-4-sonnet-thinking",4253741,"Included"
+"2025-06-27T13:57:40.733Z","You","Included in Pro","No","claude-4-sonnet-thinking",1495416,"Included"
+"2025-06-27T13:55:49.537Z","You","Included in Pro","No","claude-4-sonnet-thinking",351401,"Included"
+"2025-06-27T13:49:52.298Z","You","Included in Pro","No","claude-4-sonnet-thinking",774668,"Included"
+"2025-06-27T13:40:15.643Z","You","Included in Pro","No","claude-4-sonnet-thinking",816443,"Included"
+"2025-06-27T13:34:51.213Z","You","Included in Pro","No","claude-4-sonnet-thinking",739984,"Included"
+"2025-06-27T13:34:32.119Z","You","Errored, Not Charged","No","claude-4-sonnet-thinking",0,"Included"
+"2025-06-27T13:26:51.680Z","You","Included in Pro","No","claude-4-sonnet-thinking",1212343,"Included"
+"2025-06-27T13:24:13.805Z","You","Included in Pro","No","claude-4-sonnet-thinking",97526,"Included"
+"2025-06-27T12:57:53.457Z","You","Included in Pro","No","claude-4-sonnet-thinking",1035852,"Included"
+"2025-06-27T12:50:26.511Z","You","Included in Pro","No","claude-4-sonnet-thinking",91568,"Included"
+"2025-06-27T12:33:33.058Z","You","Included in Pro","No","claude-4-sonnet-thinking",307975,"Included"
+"2025-06-27T12:27:07.364Z","You","Included in Pro","No","claude-4-sonnet-thinking",1803126,"Included"
+"2025-06-27T12:21:36.179Z","You","Included in Pro","No","claude-3.5-sonnet",3082,"Included"
+"2025-06-27T12:21:07.263Z","You","Included in Pro","No","claude-3.5-sonnet",7238,"Included"
+"2025-06-27T12:20:44.620Z","You","Included in Pro","No","claude-3.5-sonnet",3048,"Included"
+"2025-06-27T12:20:29.384Z","You","Included in Pro","No","claude-3.5-sonnet",7155,"Included"
+"2025-06-27T12:15:29.943Z","You","Included in Pro","No","claude-4-sonnet-thinking",1086411,"Included"
+"2025-06-27T12:00:50.693Z","You","Included in Pro","No","claude-4-sonnet-thinking",684017,"Included"
+"2025-06-27T11:22:07.174Z","You","Included in Pro","No","claude-4-sonnet-thinking",696615,"Included"
+"2025-06-27T11:18:18.459Z","You","Included in Pro","No","claude-4-sonnet-thinking",620547,"Included"
+"2025-06-27T11:09:18.189Z","You","Included in Pro","No","claude-4-sonnet-thinking",461066,"Included"
+"2025-06-27T11:01:58.730Z","You","Included in Pro","No","claude-4-sonnet-thinking",1200173,"Included"
+"2025-06-27T10:54:59.382Z","You","Included in Pro","No","claude-4-sonnet-thinking",896873,"Included"
+"2025-06-27T10:51:41.039Z","You","Included in Pro","No","claude-4-sonnet-thinking",882197,"Included"
+"2025-06-27T10:42:12.785Z","You","Included in Pro","No","claude-4-sonnet-thinking",95829,"Included"
+"2025-06-27T10:10:19.925Z","You","Included in Pro","No","claude-4-sonnet-thinking",583651,"Included"
+"2025-06-26T15:30:31.219Z","You","Included in Pro","No","claude-4-sonnet-thinking",343510,"Included"
+"2025-06-26T14:54:39.310Z","You","Included in Pro","No","claude-4-sonnet-thinking",62743,"Included"
+"2025-06-26T14:14:20.297Z","You","Included in Pro","No","claude-4-sonnet-thinking",149514,"Included"
+"2025-06-26T14:12:36.525Z","You","Included in Pro","No","claude-4-sonnet-thinking",281915,"Included"
+"2025-06-26T14:09:35.133Z","You","Included in Pro","No","claude-4-sonnet-thinking",415985,"Included"
+"2025-06-26T14:07:04.275Z","You","Included in Pro","No","claude-4-sonnet-thinking",147615,"Included"
+"2025-06-26T09:35:29.247Z","You","Included in Pro","No","claude-4-sonnet-thinking",115742,"Included"
+"2025-06-26T09:28:25.529Z","You","Included in Pro","No","claude-4-sonnet-thinking",126373,"Included"
+"2025-06-26T09:24:29.420Z","You","Included in Pro","No","claude-4-sonnet-thinking",7861,"Included"
+"2025-06-25T16:41:22.520Z","You","Included in Pro","No","claude-4-sonnet-thinking",1786030,"Included"
+"2025-06-25T16:29:19.606Z","You","Included in Pro","No","claude-4-sonnet-thinking",1382110,"Included"
+"2025-06-25T16:17:01.805Z","You","Included in Pro","No","claude-4-sonnet-thinking",1318937,"Included"
+"2025-06-25T16:08:16.093Z","You","Included in Pro","No","claude-4-sonnet-thinking",293618,"Included"
+"2025-06-25T16:00:29.022Z","You","Included in Pro","No","claude-4-sonnet-thinking",228174,"Included"
+"2025-06-25T15:57:43.901Z","You","Included in Pro","No","claude-4-sonnet-thinking",258620,"Included"
+"2025-06-25T15:50:09.723Z","You","Included in Pro","No","claude-4-sonnet-thinking",833715,"Included"
+"2025-06-25T15:48:36.547Z","You","Included in Pro","No","claude-4-sonnet-thinking",666790,"Included"
+"2025-06-25T15:34:58.076Z","You","Included in Pro","No","claude-4-sonnet-thinking",989991,"Included"
+"2025-06-25T14:54:07.748Z","You","Included in Pro","No","claude-4-sonnet-thinking",90209,"Included"
+"2025-06-25T14:50:10.997Z","You","Included in Pro","No","claude-4-sonnet-thinking",490015,"Included"
+"2025-06-25T14:43:29.300Z","You","Included in Pro","No","claude-4-sonnet-thinking",1725766,"Included"
+"2025-06-25T14:31:18.200Z","You","Included in Pro","No","claude-4-sonnet-thinking",155108,"Included"
+"2025-06-25T14:28:44.515Z","You","Included in Pro","No","claude-4-sonnet-thinking",124813,"Included"
+"2025-06-25T14:27:32.227Z","You","Included in Pro","No","claude-4-sonnet-thinking",386648,"Included"
+"2025-06-25T14:25:50.760Z","You","Included in Pro","No","claude-4-sonnet-thinking",199914,"Included"
+"2025-06-25T14:21:44.129Z","You","Included in Pro","No","claude-4-sonnet-thinking",844050,"Included"
+"2025-06-25T14:16:19.339Z","You","Included in Pro","No","claude-4-sonnet-thinking",567950,"Included"
+"2025-06-25T14:15:26.845Z","You","Included in Pro","No","claude-4-sonnet-thinking",165511,"Included"
+"2025-06-25T13:55:22.968Z","You","Included in Pro","No","claude-4-sonnet-thinking",560045,"Included"
+"2025-06-25T13:51:41.020Z","You","Included in Pro","No","claude-4-sonnet-thinking",596817,"Included"
+"2025-06-25T13:36:13.732Z","You","Included in Pro","No","claude-4-sonnet-thinking",1094276,"Included"
+"2025-06-25T13:31:08.333Z","You","Included in Pro","No","claude-4-sonnet-thinking",390763,"Included"
+"2025-06-25T13:28:16.880Z","You","Included in Pro","No","claude-4-sonnet-thinking",226278,"Included"
+"2025-06-25T13:23:49.045Z","You","Included in Pro","No","claude-4-sonnet-thinking",77463,"Included"
+"2025-06-25T13:15:38.609Z","You","Included in Pro","No","claude-4-sonnet-thinking",514641,"Included"
+"2025-06-25T13:11:31.259Z","You","Included in Pro","No","claude-4-sonnet-thinking",448727,"Included"
+"2025-06-25T13:04:07.921Z","You","Included in Pro","No","claude-4-sonnet-thinking",1207939,"Included"
+"2025-06-25T12:58:48.166Z","You","Included in Pro","No","claude-4-sonnet-thinking",10371,"Included"
+"2025-06-25T12:06:41.112Z","You","Included in Pro","No","claude-4-sonnet-thinking",9657,"Included"
+"2025-06-25T12:05:07.149Z","You","Included in Pro","No","claude-4-sonnet-thinking",9083,"Included"
+"2025-06-25T11:40:53.248Z","You","Included in Pro","No","claude-4-sonnet-thinking",54314,"Included"
+"2025-06-25T11:34:50.170Z","You","Included in Pro","No","claude-4-sonnet-thinking",20967,"Included"
+"2025-06-25T11:28:25.748Z","You","Included in Pro","No","claude-4-sonnet-thinking",8274,"Included"
+"2025-06-25T11:19:04.036Z","You","Included in Pro","No","claude-4-sonnet-thinking",27794,"Included"
+"2025-06-25T11:14:32.143Z","You","Included in Pro","No","claude-4-sonnet-thinking",7971,"Included"
+"2025-06-24T16:09:15.665Z","You","Errored, Not Charged","No","claude-4-sonnet-thinking",0,"Included"
+"2025-06-24T16:07:35.588Z","You","Included in Pro","No","claude-4-sonnet-thinking",178084,"Included"
+"2025-06-24T15:58:10.531Z","You","Included in Pro","No","claude-4-sonnet-thinking",147998,"Included"
+"2025-06-24T15:47:58.851Z","You","Errored, Not Charged","No","claude-4-sonnet-thinking",1146751,"Included"
+"2025-06-24T15:45:09.408Z","You","Included in Pro","No","claude-4-sonnet-thinking",121720,"Included"
+"2025-06-24T15:44:23.288Z","You","Included in Pro","No","claude-4-sonnet-thinking",31926,"Included"
+"2025-06-24T15:43:43.999Z","You","Included in Pro","No","claude-4-sonnet-thinking",28231,"Included"
+"2025-06-24T15:43:13.665Z","You","Included in Pro","No","claude-4-sonnet-thinking",13680,"Included"
+"2025-06-24T15:38:10.882Z","You","Included in Pro","No","claude-4-sonnet-thinking",37336,"Included"
+"2025-06-24T15:33:48.204Z","You","Included in Pro","No","claude-4-sonnet-thinking",35472,"Included"
+"2025-06-24T13:09:44.925Z","You","Errored, Not Charged","No","claude-4-sonnet-thinking",0,"Included"
+"2025-06-24T13:07:03.334Z","You","Included in Pro","No","claude-4-sonnet-thinking",17503,"Included"
+"2025-06-24T12:59:19.487Z","You","Included in Pro","No","claude-4-sonnet-thinking",50753,"Included"
+"2025-06-24T12:58:27.332Z","You","Errored, Not Charged","No","claude-4-sonnet-thinking",17463,"Included"
+"2025-06-24T12:57:50.695Z","You","Errored, Not Charged","No","claude-4-sonnet-thinking",17369,"Included"
+"2025-06-24T12:54:24.234Z","You","Included in Pro","No","claude-4-sonnet-thinking",58530,"Included"
+"2025-06-24T12:52:55.507Z","You","Included in Pro","No","claude-4-sonnet-thinking",95268,"Included"
+"2025-06-24T12:27:42.212Z","You","Included in Pro","No","claude-4-sonnet-thinking",58214,"Included"
+"2025-06-24T12:20:11.342Z","You","Errored, Not Charged","No","claude-4-sonnet-thinking",28078,"Included"
+"2025-06-24T12:09:51.173Z","You","Included in Pro","No","claude-4-sonnet-thinking",620761,"Included"
+"2025-06-24T12:04:03.487Z","You","Included in Pro","No","claude-4-sonnet-thinking",75005,"Included"
+"2025-06-24T11:58:57.706Z","You","Errored, Not Charged","No","claude-4-sonnet-thinking",105390,"Included"
+"2025-06-24T11:58:17.507Z","You","Included in Pro","No","claude-4-sonnet-thinking",88288,"Included"
+"2025-06-24T11:55:33.067Z","You","Included in Pro","No","claude-4-sonnet-thinking",514868,"Included"
+"2025-06-24T11:50:59.778Z","You","Included in Pro","No","claude-4-sonnet-thinking",149203,"Included"
+"2025-06-24T11:39:30.602Z","You","Included in Pro","No","claude-4-sonnet-thinking",1281914,"Included"
+"2025-06-24T11:25:27.933Z","You","Included in Pro","No","claude-4-sonnet-thinking",157912,"Included"
+"2025-06-24T11:23:25.399Z","You","Included in Pro","No","claude-4-sonnet-thinking",82927,"Included"
+"2025-06-24T10:43:28.332Z","You","Errored, Not Charged","No","claude-4-sonnet-thinking",106146,"Included"
+"2025-06-24T10:13:43.033Z","You","Included in Pro","No","claude-4-sonnet-thinking",201380,"Included"
+"2025-06-24T10:03:46.213Z","You","Included in Pro","No","claude-4-sonnet-thinking",60445,"Included"
+"2025-06-24T09:57:53.684Z","You","Included in Pro","No","claude-4-sonnet-thinking",49519,"Included"
+"2025-06-24T09:35:25.235Z","You","Included in Pro","No","claude-4-sonnet-thinking",29477,"Included"
+"2025-06-24T08:49:56.002Z","You","Errored, Not Charged","No","claude-4-sonnet-thinking",740491,"Included"
+"2025-06-24T08:31:11.684Z","You","Included in Pro","No","claude-4-sonnet-thinking",47292,"Included"
+"2025-06-23T17:38:27.164Z","You","Included in Pro","No","claude-4-sonnet-thinking",30285,"Included"
+"2025-06-23T17:27:21.335Z","You","Included in Pro","No","claude-4-sonnet-thinking",401486,"Included"
+"2025-06-23T17:24:23.003Z","You","Included in Pro","No","claude-4-sonnet-thinking",28304,"Included"
+"2025-06-23T17:14:52.437Z","You","Included in Pro","No","claude-4-sonnet-thinking",104453,"Included"
+"2025-06-23T16:58:14.577Z","You","Included in Pro","No","claude-4-sonnet-thinking",110560,"Included"
+"2025-06-23T16:50:07.437Z","You","Included in Pro","No","claude-4-sonnet-thinking",330679,"Included"
+"2025-06-23T16:15:12.654Z","You","Included in Pro","No","claude-4-sonnet-thinking",120468,"Included"
+"2025-06-23T16:10:31.799Z","You","Included in Pro","No","claude-4-sonnet-thinking",178875,"Included"
+"2025-06-23T16:05:08.768Z","You","Included in Pro","No","claude-4-sonnet-thinking",271700,"Included"
+"2025-06-23T16:00:57.887Z","You","Errored, Not Charged","No","claude-4-sonnet-thinking",0,"Included"
+"2025-06-23T15:55:30.572Z","You","Included in Pro","No","claude-4-sonnet-thinking",226472,"Included"
+"2025-06-23T15:54:19.693Z","You","Included in Pro","No","claude-4-sonnet-thinking",100924,"Included"
+"2025-06-23T15:51:32.484Z","You","Included in Pro","No","claude-4-sonnet-thinking",109211,"Included"
+"2025-06-23T15:23:30.095Z","You","Included in Pro","No","claude-4-sonnet-thinking",75701,"Included"
+"2025-06-23T14:07:10.644Z","You","Included in Pro","No","claude-4-sonnet-thinking",80996,"Included"
+"2025-06-23T13:39:58.776Z","You","Included in Pro","No","claude-4-sonnet-thinking",34879,"Included"
+"2025-06-23T12:52:29.610Z","You","Included in Pro","No","claude-4-sonnet-thinking",34963,"Included"
+"2025-06-23T12:40:45.683Z","You","Included in Pro","No","claude-4-sonnet-thinking",51790,"Included"
+"2025-06-18T16:06:54.137Z","You","Included in Pro","No","claude-4-sonnet-thinking",837892,"Included"
+"2025-06-18T15:49:19.782Z","You","Included in Pro","No","claude-4-sonnet-thinking",191191,"Included"
+"2025-06-18T15:47:44.349Z","You","Errored, Not Charged","No","claude-4-sonnet-thinking",177001,"Included"
+"2025-06-18T15:42:43.053Z","You","Included in Pro","No","claude-4-sonnet-thinking",44520,"Included"
+"2025-06-18T15:29:42.287Z","You","Included in Pro","No","claude-4-sonnet-thinking",669704,"Included"
+"2025-06-18T15:26:26.734Z","You","Included in Pro","No","claude-4-sonnet-thinking",694988,"Included"
+"2025-06-18T15:23:44.679Z","You","Included in Pro","No","claude-4-sonnet-thinking",449420,"Included"
+"2025-06-18T14:51:36.424Z","You","Errored, Not Charged","No","claude-4-sonnet-thinking",252835,"Included"
+"2025-06-18T14:49:47.531Z","You","Errored, Not Charged","No","claude-4-sonnet-thinking",165857,"Included"
+"2025-06-18T14:47:19.188Z","You","Errored, Not Charged","No","claude-4-sonnet-thinking",245067,"Included"
+"2025-06-18T14:40:53.851Z","You","Included in Pro","No","claude-4-sonnet-thinking",856932,"Included"
+"2025-06-18T14:29:40.399Z","You","Included in Pro","No","claude-4-sonnet-thinking",503710,"Included"
+"2025-06-18T14:22:00.079Z","You","Included in Pro","No","claude-4-sonnet-thinking",111159,"Included"
+"2025-06-18T13:47:31.777Z","You","Included in Pro","No","claude-4-sonnet-thinking",305900,"Included"
+"2025-06-18T13:45:47.289Z","You","Included in Pro","No","claude-4-sonnet-thinking",93753,"Included"
+"2025-06-18T13:42:49.044Z","You","Included in Pro","No","claude-4-sonnet-thinking",620041,"Included"
+"2025-06-18T12:46:04.237Z","You","Included in Pro","No","claude-4-sonnet-thinking",707058,"Included"
+"2025-06-18T12:39:56.302Z","You","Included in Pro","No","claude-4-sonnet-thinking",651679,"Included"
+"2025-06-18T12:35:32.201Z","You","Included in Pro","No","claude-4-sonnet-thinking",88385,"Included"
+"2025-06-18T12:31:34.990Z","You","Included in Pro","No","claude-4-sonnet-thinking",87274,"Included"
+"2025-06-18T12:22:48.215Z","You","Included in Pro","No","claude-4-sonnet-thinking",303944,"Included"
+"2025-06-18T12:19:45.821Z","You","Included in Pro","No","claude-4-sonnet-thinking",618029,"Included"
+"2025-06-18T11:54:20.179Z","You","Included in Pro","No","claude-4-sonnet-thinking",1182722,"Included"
+"2025-06-18T11:49:23.093Z","You","Included in Pro","No","claude-4-sonnet-thinking",525728,"Included"
+"2025-06-18T11:47:44.612Z","You","Included in Pro","No","gpt-4.1",70999,"Included"
+"2025-06-18T11:44:50.031Z","You","Included in Pro","No","gpt-4.1",69883,"Included"
+"2025-06-18T11:41:04.674Z","You","Included in Pro","No","gpt-4.1",148638,"Included"
+"2025-06-18T11:39:01.779Z","You","Included in Pro","No","gpt-4.1",71989,"Included"
+"2025-06-18T11:30:17.525Z","You","Included in Pro","No","gpt-4.1",159404,"Included"
+"2025-06-18T11:29:52.194Z","You","Included in Pro","No","gpt-4.1",78991,"Included"
+"2025-06-18T11:27:38.568Z","You","Included in Pro","No","gpt-4.1",354819,"Included"
+"2025-06-18T11:26:10.328Z","You","Included in Pro","No","gpt-4.1",113593,"Included"
+"2025-06-18T11:23:14.436Z","You","Included in Pro","No","gpt-4.1",736076,"Included"
+"2025-06-18T11:09:41.332Z","You","Errored, Not Charged","No","claude-4-sonnet-thinking",298165,"Included"
+"2025-06-18T11:02:42.819Z","You","Errored, Not Charged","No","claude-4-sonnet-thinking",852982,"Included"
+"2025-06-18T10:48:12.308Z","You","Included in Pro","No","claude-4-sonnet-thinking",422089,"Included"
+"2025-06-18T10:45:10.634Z","You","Included in Pro","No","claude-4-sonnet-thinking",477900,"Included"
+"2025-06-18T10:28:41.037Z","You","Included in Pro","No","claude-4-sonnet-thinking",898102,"Included"
+"2025-06-18T10:23:11.944Z","You","Included in Pro","No","claude-4-sonnet-thinking",127944,"Included"
+"2025-06-18T10:19:43.744Z","You","Included in Pro","No","claude-4-sonnet-thinking",120650,"Included"
+"2025-06-18T10:08:37.628Z","You","Included in Pro","No","claude-4-sonnet-thinking",168186,"Included"
+"2025-06-18T10:05:42.576Z","You","Included in Pro","No","claude-4-sonnet-thinking",156582,"Included"
+"2025-06-18T09:44:44.530Z","You","Included in Pro","No","claude-4-sonnet-thinking",486290,"Included"
+"2025-06-18T09:43:19.082Z","You","Included in Pro","No","claude-4-sonnet-thinking",90179,"Included"
+"2025-06-18T09:41:51.719Z","You","Included in Pro","No","claude-4-sonnet-thinking",88701,"Included"
+"2025-06-18T09:40:16.863Z","You","Included in Pro","No","claude-4-sonnet-thinking",87716,"Included"
+"2025-06-18T09:35:58.566Z","You","Included in Pro","No","claude-4-sonnet-thinking",86899,"Included"
+"2025-06-18T09:26:45.026Z","You","Included in Pro","No","claude-4-sonnet-thinking",85829,"Included"
+"2025-06-18T09:21:05.826Z","You","Included in Pro","No","claude-4-sonnet-thinking",83328,"Included"
+"2025-06-18T09:14:44.405Z","You","Included in Pro","No","claude-4-sonnet-thinking",82190,"Included"
+"2025-06-18T09:13:03.285Z","You","Aborted, Not Charged","No","claude-4-sonnet-thinking",0,"Included"
+"2025-06-18T08:56:17.255Z","You","Included in Pro","No","claude-4-sonnet-thinking",81153,"Included"
+"2025-06-18T08:54:40.882Z","You","Included in Pro","No","claude-4-sonnet-thinking",80583,"Included"
+"2025-06-17T17:35:23.738Z","You","Included in Pro","No","claude-4-sonnet-thinking",275828,"Included"
+"2025-06-17T17:27:40.090Z","You","Included in Pro","No","claude-4-sonnet-thinking",1239105,"Included"
+"2025-06-17T17:17:14.884Z","You","Included in Pro","No","claude-4-sonnet-thinking",186461,"Included"
+"2025-06-17T17:15:31.663Z","You","Included in Pro","No","claude-4-sonnet-thinking",270420,"Included"
+"2025-06-17T17:10:51.326Z","You","Included in Pro","No","claude-4-sonnet-thinking",507102,"Included"
+"2025-06-17T17:07:22.544Z","You","Included in Pro","No","claude-4-sonnet-thinking",158692,"Included"
+"2025-06-17T17:03:02.863Z","You","Included in Pro","No","claude-4-sonnet-thinking",132881,"Included"
+"2025-06-17T16:57:51.139Z","You","Included in Pro","No","claude-4-sonnet-thinking",114907,"Included"
+"2025-06-17T16:56:50.569Z","You","Included in Pro","No","claude-4-sonnet-thinking",168189,"Included"
+"2025-06-17T16:55:53.573Z","You","Included in Pro","No","claude-4-sonnet-thinking",107591,"Included"
+"2025-06-17T16:50:21.860Z","You","Included in Pro","No","claude-4-sonnet-thinking",98558,"Included"
+"2025-06-17T16:43:51.339Z","You","Included in Pro","No","claude-4-sonnet-thinking",90469,"Included"
+"2025-06-17T16:42:30.021Z","You","Errored, Not Charged","No","auto",0,"Included"
+"2025-06-17T16:39:14.533Z","You","Errored, Not Charged","No","auto",5257,"Included"
+"2025-06-17T16:37:41.942Z","You","Errored, Not Charged","No","auto",0,"Included"
+"2025-06-17T16:37:05.122Z","You","Errored, Not Charged","No","auto",0,"Included"
+"2025-06-17T16:35:30.660Z","You","Errored, Not Charged","No","auto",3718,"Included"
+"2025-06-17T16:30:12.764Z","You","Included in Pro","No","auto",7532,"Included"
+"2025-06-17T16:28:45.292Z","You","Included in Pro","No","auto",5415,"Included"
+"2025-06-17T16:22:56.263Z","You","Included in Pro","No","auto",3789,"Included"
+"2025-06-17T16:21:43.043Z","You","Included in Pro","No","auto",24181,"Included"
+"2025-06-17T16:11:05.032Z","You","Included in Pro","No","auto",28612,"Included"
+"2025-06-17T15:54:54.520Z","You","Included in Pro","No","auto","","Included"
+"2025-06-17T15:51:44.647Z","You","Included in Pro","No","auto","","Included"
+"2025-06-17T15:47:35.745Z","You","Included in Pro","No","auto","","Included"
+"2025-06-17T15:39:17.351Z","You","Included in Pro","No","auto","","Included"
+"2025-06-17T15:32:49.405Z","You","Included in Pro","No","auto","","Included"
+"2025-06-17T15:28:23.601Z","You","Included in Pro","No","auto","","Included"
+"2025-06-17T15:27:28.097Z","You","Errored, Not Charged","No","auto","","Included"
+"2025-06-17T15:24:53.243Z","You","Errored, Not Charged","No","auto","","Included"
+"2025-06-17T15:01:31.564Z","You","Errored, Not Charged","No","auto","","Included"
+"2025-06-17T15:00:31.489Z","You","Included in Pro","No","auto","","Included"
+"2025-06-17T14:54:16.547Z","You","Included in Pro","No","auto","","Included"
+"2025-06-17T14:53:48.054Z","You","Included in Pro","No","auto","","Included"
+"2025-06-17T14:52:07.089Z","You","Included in Pro","No","auto","","Included"
+"2025-06-17T14:49:02.993Z","You","Included in Pro","No","auto","","Included"
+"2025-06-17T14:46:36.525Z","You","Included in Pro","No","auto","","Included"
+"2025-06-17T14:45:32.792Z","You","Included in Pro","No","auto","","Included"
+"2025-06-17T14:36:46.590Z","You","Included in Pro","No","auto","","Included"
+"2025-06-17T14:18:57.137Z","You","Included in Pro","No","auto","","Included"
+"2025-06-17T14:14:41.228Z","You","Included in Pro","No","auto","","Included"
+"2025-06-17T14:06:47.183Z","You","Included in Pro","No","auto","","Included"
+"2025-06-17T14:00:56.614Z","You","Included in Pro","No","auto","","Included"
+"2025-06-17T13:02:47.862Z","You","Included in Pro","No","auto","","Included"
+"2025-06-17T12:56:22.163Z","You","Included in Pro","No","auto","","Included"
+"2025-06-17T12:47:51.371Z","You","Included in Pro","No","auto","","Included"
+"2025-06-17T12:45:04.683Z","You","Included in Pro","No","auto","","Included"
+"2025-06-17T12:34:04.210Z","You","Included in Pro","No","auto","","Included"
+"2025-06-17T12:18:52.647Z","You","Included in Pro","No","auto","","Included"
+"2025-06-17T12:12:30.826Z","You","Included in Pro","No","auto","","Included"
+"2025-06-17T12:10:20.302Z","You","Included in Pro","No","auto","","Included"
+"2025-06-17T12:09:19.387Z","You","Included in Pro","No","auto","","Included"
+"2025-06-17T12:07:45.143Z","You","Included in Pro","No","auto","","Included"
+"2025-06-17T12:06:48.011Z","You","Errored, Not Charged","No","auto","","Included"
+"2025-06-17T11:49:57.100Z","You","Included in Pro","No","auto","","Included"
+"2025-06-17T11:34:34.877Z","You","Included in Pro","No","auto","","Included"
+"2025-06-13T12:59:30.463Z","You","Usage-based","No","auto","",
+"2025-06-13T12:36:22.496Z","You","Usage-based","No","auto","",
+"2025-06-13T11:53:11.218Z","You","Usage-based","No","auto","",
+"2025-06-13T11:51:03.489Z","You","Usage-based","No","auto","",
+"2025-06-13T11:35:53.956Z","You","Usage-based","No","auto","",
+"2025-06-13T11:34:05.246Z","You","Usage-based","No","auto","",
+"2025-06-13T11:30:08.365Z","You","Usage-based","No","auto","",
+"2025-06-13T11:25:31.104Z","You","Usage-based","No","auto","",
+"2025-06-13T11:23:46.416Z","You","Usage-based","No","auto","",
+"2025-06-13T11:21:16.496Z","You","Usage-based","No","auto","",
+"2025-06-13T11:17:08.659Z","You","Usage-based","No","auto","",
+"2025-06-13T11:10:44.434Z","You","Errored, Not Charged","No","auto","","Included"
+"2025-06-13T11:05:50.531Z","You","Usage-based","No","auto","",
+"2025-06-13T11:04:07.131Z","You","Usage-based","No","auto","",
+"2025-06-13T10:58:10.054Z","You","Usage-based","No","auto","",
+"2025-06-13T10:47:55.976Z","You","Usage-based","No","auto","",
+"2025-06-13T10:45:01.015Z","You","Usage-based","No","auto","",
+"2025-06-13T10:41:37.244Z","You","Usage-based","No","auto","",
+"2025-06-13T10:38:08.007Z","You","Usage-based","No","auto","",
+"2025-06-13T10:30:30.505Z","You","Usage-based","No","auto","",
+"2025-06-13T10:25:56.276Z","You","Usage-based","No","auto","",
+"2025-06-13T08:53:17.316Z","You","Usage-based","No","auto","",
+"2025-06-12T15:41:22.791Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-12T15:28:01.924Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-12T15:26:24.101Z","You","Errored, Not Charged","No","claude-3.5-sonnet","","Included"
+"2025-06-12T15:09:24.430Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-12T14:46:39.468Z","You","Errored, Not Charged","No","claude-3.5-sonnet","","Included"
+"2025-06-12T14:35:48.136Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-12T14:34:07.348Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-12T14:29:37.112Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-12T14:22:13.733Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-12T14:19:32.787Z","You","Errored, Not Charged","No","claude-3.5-sonnet","","Included"
+"2025-06-12T14:08:00.394Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-12T14:01:01.036Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-12T13:59:22.606Z","You","Errored, Not Charged","No","claude-3.5-sonnet","","Included"
+"2025-06-12T13:41:45.818Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-12T13:27:19.923Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-12T13:22:46.164Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-12T13:16:23.719Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-12T13:08:54.111Z","You","Errored, Not Charged","No","claude-3.5-sonnet","","Included"
+"2025-06-12T13:03:58.124Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-12T13:02:49.788Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-12T12:58:16.383Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-12T12:56:17.759Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-12T12:49:05.771Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-12T12:45:19.723Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-12T12:40:39.480Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-12T12:38:42.054Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-12T12:36:41.427Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-12T12:30:47.036Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-12T12:29:01.519Z","You","Included in Pro","No","claude-3.5-sonnet","","Included"
+"2025-06-12T12:27:04.559Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-12T12:15:25.477Z","You","Included in Pro","No","claude-3.5-sonnet","","Included"
+"2025-06-12T12:07:52.135Z","You","Errored, Not Charged","No","claude-3.5-sonnet","","Included"
+"2025-06-12T12:01:01.062Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-12T11:54:54.940Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-12T11:53:57.973Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-12T11:52:02.352Z","You","Errored, Not Charged","No","claude-3.5-sonnet","","Included"
+"2025-06-12T11:51:14.170Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-12T11:26:40.244Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-12T11:26:04.970Z","You","Included in Pro","No","claude-3.5-sonnet","","Included"
+"2025-06-12T11:19:07.332Z","You","Errored, Not Charged","No","claude-3.5-sonnet","","Included"
+"2025-06-12T11:17:12.675Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-12T10:50:59.834Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-12T10:41:42.485Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-12T10:27:30.382Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-12T10:20:36.721Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-12T10:18:58.808Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-12T10:14:13.165Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-12T10:12:32.957Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-12T10:10:20.372Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-12T09:57:08.777Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-12T09:56:04.093Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-12T09:38:42.842Z","You","Errored, Not Charged","No","claude-3.5-sonnet","","Included"
+"2025-06-12T09:31:47.303Z","You","Errored, Not Charged","No","claude-3.5-sonnet","","Included"
+"2025-06-12T09:29:09.845Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-12T09:28:38.697Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-12T09:26:39.906Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-12T09:22:48.249Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-12T09:21:32.787Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-12T09:14:34.569Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-12T09:13:06.635Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-11T15:05:01.785Z","You","Errored, Not Charged","No","claude-3.5-sonnet","","Included"
+"2025-06-11T14:57:41.421Z","You","Errored, Not Charged","No","claude-3.5-sonnet","","Included"
+"2025-06-11T14:15:37.211Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-11T14:08:17.380Z","You","Errored, Not Charged","No","claude-3.5-sonnet","","Included"
+"2025-06-11T14:03:52.013Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-11T13:54:57.348Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-11T13:47:44.581Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-11T13:45:43.846Z","You","Included in Pro","No","claude-3.5-sonnet","","Included"
+"2025-06-11T13:43:38.662Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-11T13:40:31.165Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-11T13:38:32.388Z","You","Included in Pro","No","claude-3.5-sonnet","","Included"
+"2025-06-11T13:35:35.577Z","You","Included in Pro","No","claude-3.5-sonnet","","Included"
+"2025-06-11T13:27:24.683Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-11T13:25:01.620Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-11T13:22:30.028Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-11T13:19:26.745Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-11T13:16:43.817Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-11T13:16:07.572Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-11T13:15:06.025Z","You","Errored, Not Charged","No","claude-3.5-sonnet","","Included"
+"2025-06-11T13:11:52.128Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-11T13:07:21.145Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-11T13:04:42.671Z","You","Errored, Not Charged","No","claude-3.5-sonnet","","Included"
+"2025-06-11T12:56:16.742Z","You","Errored, Not Charged","No","claude-3.5-sonnet","","Included"
+"2025-06-11T12:55:07.318Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-11T12:54:20.968Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-11T12:51:29.122Z","You","Included in Pro","No","claude-3.5-sonnet","","Included"
+"2025-06-11T12:50:26.137Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-11T12:49:21.746Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-11T12:48:43.555Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-11T12:46:55.725Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-11T12:45:12.399Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-11T12:41:07.966Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-11T12:38:27.674Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-11T12:37:02.723Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-11T12:35:30.536Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-11T12:26:05.914Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-11T12:24:49.574Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-11T12:14:32.372Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-11T11:56:34.455Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-11T11:55:17.151Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-11T11:51:20.237Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-11T11:50:29.237Z","You","Errored, Not Charged","No","claude-3.5-sonnet","","Included"
+"2025-06-11T11:41:49.696Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-11T11:33:17.653Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-11T11:25:48.001Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-11T09:44:14.934Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-11T09:42:56.069Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-11T09:42:06.370Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-11T09:40:46.833Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-11T09:36:14.807Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-11T09:32:32.765Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-11T09:04:23.547Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-11T09:02:30.710Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-11T08:29:17.924Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-10T16:11:55.939Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-10T15:56:22.692Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-10T15:55:20.506Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-10T15:48:30.702Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-10T15:44:38.891Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-10T15:43:27.974Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-10T15:41:29.010Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-10T15:38:55.604Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-10T14:08:39.662Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-10T14:07:34.226Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-10T13:58:31.366Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-10T13:55:50.009Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-10T13:47:09.693Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-10T13:23:06.235Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-10T13:18:42.559Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-10T13:14:14.946Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-10T13:03:13.190Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-10T12:03:24.579Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-10T12:01:38.425Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-10T12:00:13.477Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-10T11:59:06.583Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-10T11:57:50.751Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-10T11:56:54.582Z","You","Included in Pro","No","claude-3.5-sonnet","","Included"
+"2025-06-10T11:55:37.118Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-10T11:54:24.892Z","You","Included in Pro","No","claude-3.5-sonnet","","Included"
+"2025-06-10T11:53:20.184Z","You","Included in Pro","No","claude-3.5-sonnet","","Included"
+"2025-06-10T11:52:27.997Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-10T11:47:25.068Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-10T11:45:04.010Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-10T11:40:50.999Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-10T11:05:26.243Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-10T10:58:15.946Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-10T10:57:08.320Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-10T10:49:27.856Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-10T10:49:01.187Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-10T10:46:17.880Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-10T10:41:48.883Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-10T10:24:56.347Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-10T09:24:55.233Z","You","Included in Pro","No","claude-3.5-sonnet","","Included"
+"2025-06-10T09:04:54.633Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-10T08:40:24.622Z","You","Included in Pro","No","claude-3.5-sonnet","","Included"
+"2025-06-10T08:39:03.033Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-10T08:38:06.959Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-10T08:37:38.665Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-10T08:35:00.788Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-10T08:29:01.812Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-10T08:27:18.618Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-09T16:25:21.851Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-09T16:15:55.988Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-09T16:14:47.175Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-09T16:12:08.857Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-09T16:09:30.946Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-09T15:52:47.954Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-09T15:48:44.055Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-09T15:46:40.272Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-09T15:24:22.847Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-09T14:44:54.577Z","You","Included in Pro","No","claude-3.5-sonnet","","Included"
+"2025-06-09T14:44:01.560Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-09T14:41:44.242Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-09T14:39:23.822Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-09T14:37:16.135Z","You","Errored, Not Charged","No","claude-3.5-sonnet","","Included"
+"2025-06-09T14:04:38.946Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-09T13:59:26.412Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-09T13:57:41.391Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-09T13:56:18.610Z","You","Errored, Not Charged","No","claude-3.5-sonnet","","Included"
+"2025-06-09T13:50:03.273Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-09T13:46:20.731Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-09T13:44:57.984Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-09T13:43:06.114Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-09T13:40:52.905Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-09T13:27:48.409Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-09T13:26:39.448Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-09T13:25:38.544Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-09T13:10:10.242Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-09T13:08:14.871Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-09T13:06:44.941Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-09T13:05:05.429Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-09T13:01:05.397Z","You","Included in Pro","No","claude-3.5-sonnet","","Included"
+"2025-06-09T12:50:45.669Z","You","Included in Pro","No","claude-3.5-sonnet","","Included"
+"2025-06-09T12:48:15.726Z","You","Errored, Not Charged","No","claude-3.5-sonnet","","Included"
+"2025-06-09T12:45:32.861Z","You","Errored, Not Charged","No","claude-3.5-sonnet","","Included"
+"2025-06-09T12:39:57.634Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-09T12:33:06.565Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-09T12:19:19.638Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-09T12:18:28.799Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-09T12:17:44.083Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-09T12:16:49.427Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-09T12:15:47.172Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-09T12:13:52.250Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-09T12:12:03.171Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-09T12:06:52.246Z","You","Included in Pro","No","claude-3.5-sonnet","","Included"
+"2025-06-09T11:31:27.410Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-09T09:59:04.718Z","You","Included in Pro","No","claude-3.5-sonnet","","Included"
+"2025-06-09T09:57:08.793Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-09T09:49:24.787Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-09T09:45:56.553Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-09T09:36:55.361Z","You","Errored, Not Charged","No","claude-3.5-sonnet","","Included"
+"2025-06-09T09:34:37.928Z","You","Included in Pro","No","claude-3.5-sonnet","","Included"
+"2025-06-09T09:19:09.427Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-09T08:51:25.573Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-09T08:47:41.002Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-09T08:43:02.898Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T16:54:20.847Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T16:47:42.248Z","You","Included in Pro","No","claude-3.5-sonnet","","Included"
+"2025-06-06T16:39:01.772Z","You","Errored, Not Charged","No","claude-3.5-sonnet","","Included"
+"2025-06-06T16:32:50.221Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T15:58:39.065Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T15:48:16.693Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T15:39:56.158Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T15:32:44.722Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T15:31:19.017Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T15:24:06.488Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T15:19:32.164Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T15:18:14.291Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T15:01:12.794Z","You","Errored, Not Charged","No","claude-3.5-sonnet","","Included"
+"2025-06-06T15:00:13.419Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T14:55:56.006Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T14:50:52.791Z","You","Errored, Not Charged","No","claude-3.5-sonnet","","Included"
+"2025-06-06T14:49:42.783Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T14:49:10.381Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T14:47:36.607Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T14:43:34.959Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T14:09:28.841Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T14:06:19.627Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T14:04:25.442Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T13:55:42.789Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T13:54:29.855Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T13:53:50.086Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T13:53:13.564Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T13:48:49.051Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T13:47:03.610Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T13:38:58.741Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T13:37:39.689Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T13:36:27.615Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T13:35:35.340Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T13:31:17.442Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T13:21:13.513Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T13:20:36.348Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T13:18:59.920Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T13:15:29.455Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T13:07:06.738Z","You","Errored, Not Charged","No","claude-3.5-sonnet","","Included"
+"2025-06-06T13:03:11.446Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T12:48:51.606Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T12:46:49.373Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T12:41:52.413Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T12:40:04.351Z","You","Included in Pro","No","claude-3.5-sonnet","","Included"
+"2025-06-06T12:39:29.522Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T12:38:36.789Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T12:11:20.394Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T11:57:38.025Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T11:49:19.916Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T11:43:50.684Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T11:29:30.061Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T11:16:38.328Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T11:15:27.510Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T11:14:22.935Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T11:12:04.776Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T11:10:32.096Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T11:08:51.508Z","You","Included in Pro","No","claude-3.5-sonnet","","Included"
+"2025-06-06T11:08:13.520Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T11:06:49.761Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T11:04:40.456Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T11:03:36.528Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T11:02:03.545Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T11:00:13.973Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T10:58:32.156Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T10:55:45.689Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T10:53:15.920Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T10:50:06.781Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T10:49:46.776Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T10:47:23.520Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T10:46:18.180Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T10:44:00.423Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T10:40:21.753Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T10:34:45.849Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T10:33:20.931Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T10:24:41.338Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T10:21:25.458Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T10:19:43.973Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T10:01:57.477Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T09:56:54.662Z","You","Included in Pro","No","claude-3.5-sonnet","","Included"
+"2025-06-06T09:48:04.523Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T09:42:04.734Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T09:38:07.497Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T09:31:27.882Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T09:30:19.044Z","You","Errored, Not Charged","No","claude-3.5-sonnet","","Included"
+"2025-06-06T09:27:00.605Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T09:25:30.422Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T09:24:32.351Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T09:22:56.854Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T09:21:40.536Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T09:20:32.491Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T09:18:55.614Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T09:13:46.755Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T09:13:24.414Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T09:09:54.133Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T09:03:50.807Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T09:03:00.239Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T08:46:43.942Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T08:37:15.457Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T08:33:24.580Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T08:29:33.372Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T08:26:49.409Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T08:25:57.681Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-06T08:23:25.343Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T21:24:03.288Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T21:15:51.506Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T21:10:44.144Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T21:07:52.748Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T21:01:39.529Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T20:54:19.175Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T20:52:59.766Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T20:49:26.613Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T20:48:10.150Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T16:47:08.227Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T16:38:37.920Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T16:35:01.852Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T16:33:12.036Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T16:29:41.319Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T16:21:01.712Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T16:20:20.561Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T16:18:32.185Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T16:12:07.305Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T16:10:25.640Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T16:08:22.423Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T16:07:25.295Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T16:06:31.605Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T16:04:40.385Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T15:58:19.900Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T15:48:47.003Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T15:47:01.186Z","You","Included in Pro","No","claude-3.5-sonnet","","Included"
+"2025-06-05T15:45:22.586Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T15:40:34.013Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T15:11:17.145Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T15:07:48.216Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T15:04:07.840Z","You","Errored, Not Charged","No","claude-3.5-sonnet","","Included"
+"2025-06-05T15:02:25.273Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T14:59:34.114Z","You","Errored, Not Charged","No","claude-3.5-sonnet","","Included"
+"2025-06-05T14:56:09.621Z","You","Errored, Not Charged","No","claude-3.5-sonnet","","Included"
+"2025-06-05T14:49:02.618Z","You","Included in Pro","No","claude-3.5-sonnet","","Included"
+"2025-06-05T14:47:02.429Z","You","Errored, Not Charged","No","claude-3.5-sonnet","","Included"
+"2025-06-05T14:45:25.539Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T14:42:54.540Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T14:31:58.049Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T14:29:07.541Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T14:24:35.499Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T14:22:14.702Z","You","Errored, Not Charged","No","claude-3.5-sonnet","","Included"
+"2025-06-05T14:20:47.073Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T14:16:17.026Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T14:14:42.062Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T14:11:46.916Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T14:10:12.777Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T14:08:37.925Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T14:06:22.438Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T14:04:53.708Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T13:53:02.769Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T13:51:55.680Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T13:50:13.316Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T13:48:46.938Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T13:47:39.532Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T13:46:02.655Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T13:44:49.535Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T13:33:50.753Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T13:33:13.156Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T13:32:11.783Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T13:13:09.054Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T13:11:39.093Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T13:10:11.581Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T13:06:50.432Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T13:05:41.175Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T13:02:55.330Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T12:58:52.140Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T12:56:11.546Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T12:55:29.729Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T12:31:39.959Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T12:29:05.518Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T12:27:07.566Z","You","Included in Pro","No","claude-3.5-sonnet","","Included"
+"2025-06-05T09:39:16.186Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-05T09:04:33.207Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-04T15:22:03.245Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-04T15:21:46.964Z","You","Errored, Not Charged","No","claude-3.5-sonnet","","Included"
+"2025-06-04T15:17:53.693Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-04T15:08:01.956Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-04T15:06:44.488Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-04T15:05:06.090Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-04T15:03:31.975Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-04T15:00:43.087Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-04T14:55:01.958Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-04T14:53:39.834Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-04T14:49:02.395Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-04T12:03:36.496Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-04T12:02:27.361Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-04T11:19:39.525Z","You","Included in Pro","No","claude-3.5-sonnet","","Included"
+"2025-06-04T11:17:30.781Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-04T11:14:12.020Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-04T11:11:37.748Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-04T11:02:30.697Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-04T11:01:32.580Z","You","Errored, Not Charged","No","claude-3.5-sonnet","","Included"
+"2025-06-04T11:00:03.294Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-04T10:58:09.179Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-04T10:54:29.375Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-04T10:44:58.140Z","You","Included in Pro","No","claude-3.5-sonnet","","Included"
+"2025-06-04T10:43:19.693Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-04T10:38:33.037Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-04T10:33:50.820Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-04T10:29:16.998Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-04T10:27:43.570Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-04T10:26:39.839Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-04T10:22:16.960Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-04T10:15:28.942Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-04T09:48:48.542Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-04T09:47:41.532Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-04T09:46:46.479Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-04T09:45:51.846Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-04T09:44:38.960Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-04T09:35:48.280Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-04T09:31:32.794Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-04T09:30:10.855Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T15:51:20.467Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T15:45:46.211Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T15:42:39.259Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T15:35:31.591Z","You","Errored, Not Charged","No","claude-3.5-sonnet","","Included"
+"2025-06-03T15:31:15.102Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T15:27:16.411Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T15:15:12.483Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T14:56:38.725Z","You","Errored, Not Charged","No","claude-3.5-sonnet","","Included"
+"2025-06-03T14:36:18.553Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T14:28:04.592Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T14:25:14.015Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T14:09:35.251Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T14:02:22.495Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T14:00:56.578Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T13:57:33.974Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T13:52:02.396Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T13:49:53.425Z","You","Errored, Not Charged","No","claude-3.5-sonnet","","Included"
+"2025-06-03T13:49:15.539Z","You","Errored, Not Charged","No","claude-3.5-sonnet","","Included"
+"2025-06-03T12:34:07.689Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T12:19:41.772Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T11:54:30.165Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T11:50:17.521Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T11:38:12.218Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T11:36:22.936Z","You","Included in Pro","No","claude-3.5-sonnet","","Included"
+"2025-06-03T11:35:57.635Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T11:24:40.199Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T11:22:09.770Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T11:19:02.756Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T11:17:05.344Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T11:11:48.633Z","You","Included in Pro","No","claude-3.5-sonnet","","Included"
+"2025-06-03T11:10:58.869Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T11:09:26.583Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T10:48:11.199Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T10:46:29.849Z","You","Included in Pro","No","claude-3.5-sonnet","","Included"
+"2025-06-03T10:43:33.148Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T10:39:24.606Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T10:36:53.240Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T10:34:19.571Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T10:30:15.439Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T10:28:16.777Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T10:27:14.274Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T10:24:33.429Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T10:22:40.990Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T10:21:54.553Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T10:19:42.623Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T10:18:42.473Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T10:16:21.595Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T10:14:50.066Z","You","Included in Pro","No","claude-3.5-sonnet","","Included"
+"2025-06-03T10:08:21.348Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T10:06:04.699Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T10:02:53.750Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T10:00:42.384Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T09:59:03.805Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T09:57:23.473Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T09:56:12.156Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T09:54:39.408Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T09:53:31.363Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T09:45:44.799Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T09:44:33.060Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T09:43:31.350Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T09:41:46.964Z","You","Included in Pro","No","claude-3.5-sonnet","","Included"
+"2025-06-03T09:39:37.222Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T09:38:33.396Z","You","Included in Pro","No","claude-3.5-sonnet","","Included"
+"2025-06-03T09:35:50.035Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T09:35:02.161Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T09:31:44.245Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T09:26:53.009Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T09:25:09.400Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T09:22:36.765Z","You","Included in Pro","No","claude-3.5-sonnet","","Included"
+"2025-06-03T09:20:45.036Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T09:16:39.924Z","You","Included in Pro","No","claude-3.5-sonnet","","Included"
+"2025-06-03T09:15:01.046Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T09:12:48.753Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T09:07:12.405Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T09:02:57.894Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T09:01:44.612Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T08:58:31.946Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T08:56:18.339Z","You","Included in Pro","No","claude-3.5-sonnet","","Included"
+"2025-06-03T08:53:25.320Z","You","Included in Pro","No","claude-3.5-sonnet","","Included"
+"2025-06-03T08:45:38.336Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T08:42:05.877Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T08:32:54.373Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T08:31:47.769Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T08:29:22.979Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T08:27:00.579Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T08:22:42.864Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-03T08:21:43.713Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-02T16:17:08.565Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-02T16:15:56.983Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-02T16:14:06.051Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-02T16:09:15.117Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-02T16:04:27.236Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-02T14:58:08.464Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-02T14:56:25.755Z","You","Errored, Not Charged","No","claude-3.5-sonnet","","Included"
+"2025-06-02T14:43:59.118Z","You","Included in Pro","No","claude-3.5-sonnet","","Included"
+"2025-06-02T14:42:41.876Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-02T14:41:18.991Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-02T14:39:42.857Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-02T14:38:25.108Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-02T14:36:27.754Z","You","Included in Pro","No","claude-3.5-sonnet","","Included"
+"2025-06-02T14:29:40.126Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-02T14:15:23.606Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-02T14:14:05.399Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-02T14:12:12.738Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-02T14:10:14.509Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-02T14:07:34.231Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-02T14:04:03.418Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-02T14:03:12.706Z","You","Included in Pro","No","claude-3.5-sonnet","","Included"
+"2025-06-02T13:58:04.536Z","You","Included in Pro","No","claude-3.5-sonnet","","Included"
+"2025-06-02T13:56:57.280Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-02T13:53:58.844Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-02T13:51:17.629Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-02T13:47:02.023Z","You","Included in Pro","No","claude-3.5-sonnet","","Included"
+"2025-06-02T13:44:26.530Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-02T13:43:31.595Z","You","Included in Pro","No","claude-3.5-sonnet","","Included"
+"2025-06-02T13:41:45.176Z","You","Included in Pro","No","claude-3.5-sonnet","","Included"
+"2025-06-02T13:38:00.266Z","You","Included in Pro","No","claude-3.5-sonnet","","Included"
+"2025-06-02T13:34:03.201Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-02T13:29:14.906Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-02T13:03:48.900Z","You","Included in Pro","No","claude-3.5-sonnet","","Included"
+"2025-06-02T12:59:59.660Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-02T12:57:55.639Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-02T12:55:06.227Z","You","Included in Pro","No","claude-3.5-sonnet","","Included"
+"2025-06-02T12:52:28.859Z","You","Included in Pro","No","claude-3.5-sonnet","","Included"
+"2025-06-02T12:50:47.131Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-02T12:41:02.991Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-02T12:33:50.779Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-02T12:30:41.311Z","You","Included in Pro","No","claude-3.5-sonnet","","Included"
+"2025-06-02T12:21:24.163Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-02T12:19:24.512Z","You","Included in Pro","No","claude-3.5-sonnet","","Included"
+"2025-06-02T12:17:32.605Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-02T12:16:04.845Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-02T12:14:10.381Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-02T12:13:48.763Z","You","Errored, Not Charged","No","claude-3.5-sonnet","","Included"
+"2025-06-02T12:10:03.956Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-02T12:01:59.038Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-02T12:00:29.400Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-02T11:54:51.340Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-02T11:53:34.201Z","You","Included in Pro","No","claude-3.5-sonnet","","Included"
+"2025-06-02T11:49:48.879Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-02T11:41:54.415Z","You","Errored, Not Charged","No","claude-3.5-sonnet","","Included"
+"2025-06-02T11:38:11.322Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-02T11:36:33.896Z","You","Errored, Not Charged","No","claude-3.5-sonnet","","Included"
+"2025-06-02T11:31:52.309Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-02T11:30:07.905Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-02T11:26:26.268Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-02T11:22:45.519Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-01T19:14:42.282Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-01T19:11:39.775Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-01T19:05:02.918Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-01T19:01:49.701Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-01T19:00:25.026Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-01T18:56:42.415Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-01T18:55:20.959Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-01T18:28:15.919Z","You","Usage-based","No","claude-3.5-sonnet","",
+"2025-06-01T18:11:04.162Z","You","Usage-based","No","claude-3.5-sonnet","",

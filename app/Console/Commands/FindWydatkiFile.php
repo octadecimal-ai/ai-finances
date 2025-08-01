@@ -105,12 +105,12 @@ class FindWydatkiFile extends Command
             $highestRow = $worksheet->getHighestRow();
             $highestColumn = $worksheet->getHighestColumn();
             
-            for ($row = 1; $row <= min(20, $highestRow); $row++) {
+            for ($row = 1; $row <= min(50, $highestRow); $row++) {
                 $rowData = [];
-                for ($col = 'A'; $col <= $highestColumn; $col++) {
-                    $cellValue = $worksheet->getCell($col . $row)->getValue();
-                    $rowData[] = $cellValue ?? '';
-                }
+                            for ($col = 'A'; $col <= 'Z'; $col++) {
+                $cellValue = $worksheet->getCell($col . $row)->getValue();
+                $rowData[] = $cellValue ?? '';
+            }
                 $data[] = $rowData;
             }
             

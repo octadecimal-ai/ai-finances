@@ -49,15 +49,15 @@
                         <div class="space-y-2">
                             <div class="flex justify-between">
                                 <span class="font-medium">Użyte:</span>
-                                <span>{{ \App\Helpers\NumberHelper::formatBytes($storage['used'] ?? 0) }}</span>
+                                <span>{{ number_format($storage['used'] ?? 0) }} bajtów</span>
                             </div>
                             <div class="flex justify-between">
                                 <span class="font-medium">Dostępne:</span>
-                                <span>{{ \App\Helpers\NumberHelper::formatBytes($storage['available'] ?? 0) }}</span>
+                                <span>{{ number_format($storage['available'] ?? 0) }} bajtów</span>
                             </div>
                             <div class="flex justify-between">
                                 <span class="font-medium">Łącznie:</span>
-                                <span>{{ \App\Helpers\NumberHelper::formatBytes($storage['total'] ?? 0) }}</span>
+                                <span>{{ number_format($storage['total'] ?? 0) }} bajtów</span>
                             </div>
                         </div>
                     </div>

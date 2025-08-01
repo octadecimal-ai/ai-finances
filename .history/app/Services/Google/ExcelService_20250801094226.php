@@ -50,6 +50,9 @@ class ExcelService
             // Pobierz dane
             $data = $this->extractDataFromWorksheet($worksheet, $range);
 
+            // Usuń tymczasowy plik
+            unlink($tempPath);
+
             return $data;
         } catch (Exception $e) {
             Log::error('Excel data extraction failed', [
@@ -84,13 +87,11 @@ class ExcelService
             // Upload do Google Drive
             $uploadResult = $this->googleDriveService->uploadFile($tempPath, $fileName, $parentFolderId);
 
+            // Usuń tymczasowy plik
+            unlink($tempPath);
+
             if ($uploadResult === null) {
                 return null;
-            }
-
-            // Usuń tymczasowy plik
-            if (file_exists($tempPath)) {
-                unlink($tempPath);
             }
 
             return $uploadResult['id'];
@@ -143,9 +144,7 @@ class ExcelService
             $success = $this->googleDriveService->updateFile($fileId, $tempPath);
 
             // Usuń tymczasowy plik
-            if (file_exists($tempPath)) {
-                unlink($tempPath);
-            }
+            unlink($tempPath);
 
             return $success;
         } catch (Exception $e) {
@@ -396,17 +395,6 @@ class ExcelService
             $descriptionIndex = array_search('opis', $headers);
             $amountIndex = array_search('kwota', $headers);
             $categoryIndex = array_search('kategoria', $headers);
-
-            \Illuminate\Support\Facades\Log::info('Analizuję nagłówki', [
-                'headers' => $headers,
-                'indices' => [
-                    'date' => $dateIndex,
-                    'description' => $descriptionIndex,
-                    'amount' => $amountIndex,
-                    'category' => $categoryIndex,
-                ],
-                'raw_headers' => $data[0]
-            ]);
 
             if ($dateIndex === false || $descriptionIndex === false || $amountIndex === false) {
                 throw new Exception('Brak wymaganych kolumn w arkuszu (Data, Opis, Kwota)');

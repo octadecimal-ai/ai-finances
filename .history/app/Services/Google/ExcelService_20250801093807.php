@@ -50,6 +50,9 @@ class ExcelService
             // Pobierz dane
             $data = $this->extractDataFromWorksheet($worksheet, $range);
 
+            // Usuń tymczasowy plik
+            unlink($tempPath);
+
             return $data;
         } catch (Exception $e) {
             Log::error('Excel data extraction failed', [
@@ -84,13 +87,11 @@ class ExcelService
             // Upload do Google Drive
             $uploadResult = $this->googleDriveService->uploadFile($tempPath, $fileName, $parentFolderId);
 
+            // Usuń tymczasowy plik
+            unlink($tempPath);
+
             if ($uploadResult === null) {
                 return null;
-            }
-
-            // Usuń tymczasowy plik
-            if (file_exists($tempPath)) {
-                unlink($tempPath);
             }
 
             return $uploadResult['id'];
@@ -143,9 +144,7 @@ class ExcelService
             $success = $this->googleDriveService->updateFile($fileId, $tempPath);
 
             // Usuń tymczasowy plik
-            if (file_exists($tempPath)) {
-                unlink($tempPath);
-            }
+            unlink($tempPath);
 
             return $success;
         } catch (Exception $e) {
@@ -397,17 +396,6 @@ class ExcelService
             $amountIndex = array_search('kwota', $headers);
             $categoryIndex = array_search('kategoria', $headers);
 
-            \Illuminate\Support\Facades\Log::info('Analizuję nagłówki', [
-                'headers' => $headers,
-                'indices' => [
-                    'date' => $dateIndex,
-                    'description' => $descriptionIndex,
-                    'amount' => $amountIndex,
-                    'category' => $categoryIndex,
-                ],
-                'raw_headers' => $data[0]
-            ]);
-
             if ($dateIndex === false || $descriptionIndex === false || $amountIndex === false) {
                 throw new Exception('Brak wymaganych kolumn w arkuszu (Data, Opis, Kwota)');
             }
@@ -417,17 +405,6 @@ class ExcelService
 
             // Rozpocznij transakcję
             \Illuminate\Support\Facades\DB::beginTransaction();
-
-            \Illuminate\Support\Facades\Log::info('Rozpoczynam import', [
-                'total_rows' => count($data),
-                'headers' => array_combine(range(0, count($headers) - 1), $headers),
-                'indices' => [
-                    'date' => $dateIndex,
-                    'description' => $descriptionIndex,
-                    'amount' => $amountIndex,
-                    'category' => $categoryIndex,
-                ],
-            ]);
 
             // Iteruj po wierszach (pomijając nagłówki)
             for ($i = 1; $i < count($data); $i++) {
@@ -484,34 +461,15 @@ class ExcelService
                     // Jeśli jest kolumna z kategorią, znajdź lub utwórz kategorię
                     if ($categoryIndex !== false && !empty($row[$categoryIndex])) {
                         $categoryName = trim($row[$categoryIndex]);
-                        \Illuminate\Support\Facades\Log::info('Kategoria', [
-                            'name' => $categoryName,
-                            'user_id' => $user->id
-                        ]);
-                        
-                        try {
-                            $category = \App\Models\Category::firstOrCreate(
-                                ['name' => $categoryName, 'user_id' => $user->id],
-                                [
-                                    'name' => $categoryName,
-                                    'user_id' => $user->id,
-                                    'is_active' => true,
-                                ]
-                            );
-                            $transactionData['category_id'] = $category->id;
-                            
-                            \Illuminate\Support\Facades\Log::info('Utworzono/znaleziono kategorię', [
-                                'id' => $category->id,
-                                'name' => $category->name
-                            ]);
-                        } catch (\Exception $e) {
-                            \Illuminate\Support\Facades\Log::error('Błąd podczas tworzenia kategorii', [
-                                'error' => $e->getMessage(),
+                        $category = \App\Models\Category::firstOrCreate(
+                            ['name' => $categoryName, 'user_id' => $user->id],
+                            [
                                 'name' => $categoryName,
-                                'user_id' => $user->id
-                            ]);
-                            throw $e;
-                        }
+                                'user_id' => $user->id,
+                                'is_active' => true,
+                            ]
+                        );
+                        $transactionData['category_id'] = $category->id;
                     }
 
                     // Sprawdź czy transakcja już istnieje
@@ -520,16 +478,6 @@ class ExcelService
                         ->where('amount', $transactionData['amount'])
                         ->where('transaction_date', $transactionData['transaction_date'])
                         ->exists();
-                        
-                    \Illuminate\Support\Facades\Log::info('Sprawdzanie duplikatu', [
-                        'exists' => $exists,
-                        'query' => [
-                            'user_id' => $user->id,
-                            'description' => $transactionData['description'],
-                            'amount' => $transactionData['amount'],
-                            'transaction_date' => $transactionData['transaction_date']
-                        ]
-                    ]);
 
                     if (!$exists) {
                         try {

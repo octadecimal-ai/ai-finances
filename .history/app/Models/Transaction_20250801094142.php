@@ -44,8 +44,6 @@ class Transaction extends Model
         'booking_date' => 'date',
         'value_date' => 'date',
         'metadata' => 'array',
-        'is_imported' => 'boolean',
-        'ai_analyzed' => 'boolean',
     ];
 
     /**

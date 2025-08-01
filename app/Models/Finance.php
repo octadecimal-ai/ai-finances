@@ -10,84 +10,185 @@ class Finance extends Model
     use HasFactory;
 
     protected $fillable = [
-        'data',
-        'opis',
-        'kwota',
-        'kategoria',
-        'status',
-        'metoda_platnosci',
-        'konto',
-        'notatki',
+        'miesiac',
+        'ostatni_dzien',
+        'dni_robocze',
+        'urlop_swieta',
+        'nadgodziny',
+        'stawka_netto',
+        'pensja_brutto',
+        'pit',
+        'vat',
+        'zus',
+        'pensja',
+        'inne_plus',
+        'pozyczki',
+        'zwrot_pozyczki',
+        'potr_is24',
+        'zosia',
+        'mieszkanie',
+        'kredyt_samochodowy',
+        'oc',
+        'play',
+        'internet',
+        'woda',
+        'inne',
+        'us_santander',
+        'vg_mc',
+        'samochod',
+        'paliwo',
+        'remont',
+        'sprzatanie',
+        'hobby',
+        'podroze',
+        'wiola_zwrot_kasy',
+        'allegro',
+        'allegro_pay',
+        'macbook_santander',
+        'note_3_8_alior_mbank',
+        'bph_silnik',
+        'alior_maroko',
+        'alior_basia',
+        'komp_dron_smartnej',
+        'smartney_7k',
+        'ca_rower_mbank',
+        'ca_wynajem_mbank',
+        'lux_med',
+        'multisport',
+        'innogy',
+        'mec_boguslawa',
+        'terapia',
+        'angielski',
+        'xiaomi',
+        'ca_eg',
+        'millenium_eg',
+        'egzekucja',
+        'alior_piec_blacharz_remont',
+        'alior_konsolidacja',
+        'wiola_plus',
+        'basia_plus_velo',
+        'basia_iphone',
+        'suma_oplat',
+        'zostaje',
+        'opis_innych',
+        'diy',
+        'wiek',
+        'kredyty_i_pozyczki',
+        'mieszkanie_kategoria',
+        'p1',
         'source_file',
         'source_id',
     ];
 
     protected $casts = [
-        'data' => 'date',
-        'kwota' => 'decimal:2',
+        'miesiac' => 'date',
+        'ostatni_dzien' => 'date',
+        'dni_robocze' => 'integer',
+        'urlop_swieta' => 'decimal:2',
+        'nadgodziny' => 'decimal:2',
+        'stawka_netto' => 'decimal:2',
+        'pensja_brutto' => 'decimal:2',
+        'pit' => 'decimal:2',
+        'vat' => 'decimal:2',
+        'zus' => 'decimal:2',
+        'pensja' => 'decimal:2',
+        'inne_plus' => 'decimal:2',
+        'pozyczki' => 'decimal:2',
+        'zwrot_pozyczki' => 'decimal:2',
+        'potr_is24' => 'decimal:2',
+        'zosia' => 'decimal:2',
+        'mieszkanie' => 'decimal:2',
+        'kredyt_samochodowy' => 'decimal:2',
+        'oc' => 'decimal:2',
+        'play' => 'decimal:2',
+        'internet' => 'decimal:2',
+        'woda' => 'decimal:2',
+        'inne' => 'decimal:2',
+        'us_santander' => 'decimal:2',
+        'vg_mc' => 'decimal:2',
+        'samochod' => 'decimal:2',
+        'paliwo' => 'decimal:2',
+        'remont' => 'decimal:2',
+        'sprzatanie' => 'decimal:2',
+        'hobby' => 'decimal:2',
+        'podroze' => 'decimal:2',
+        'wiola_zwrot_kasy' => 'decimal:2',
+        'allegro' => 'decimal:2',
+        'allegro_pay' => 'decimal:2',
+        'macbook_santander' => 'decimal:2',
+        'note_3_8_alior_mbank' => 'decimal:2',
+        'bph_silnik' => 'decimal:2',
+        'alior_maroko' => 'decimal:2',
+        'alior_basia' => 'decimal:2',
+        'komp_dron_smartnej' => 'decimal:2',
+        'smartney_7k' => 'decimal:2',
+        'ca_rower_mbank' => 'decimal:2',
+        'ca_wynajem_mbank' => 'decimal:2',
+        'lux_med' => 'decimal:2',
+        'multisport' => 'decimal:2',
+        'innogy' => 'decimal:2',
+        'mec_boguslawa' => 'decimal:2',
+        'terapia' => 'decimal:2',
+        'angielski' => 'decimal:2',
+        'xiaomi' => 'decimal:2',
+        'ca_eg' => 'decimal:2',
+        'millenium_eg' => 'decimal:2',
+        'egzekucja' => 'decimal:2',
+        'alior_piec_blacharz_remont' => 'decimal:2',
+        'alior_konsolidacja' => 'decimal:2',
+        'wiola_plus' => 'decimal:2',
+        'basia_plus_velo' => 'decimal:2',
+        'basia_iphone' => 'decimal:2',
+        'suma_oplat' => 'decimal:2',
+        'zostaje' => 'decimal:2',
+        'diy' => 'decimal:2',
+        'wiek' => 'decimal:2',
+        'kredyty_i_pozyczki' => 'decimal:2',
+        'mieszkanie_kategoria' => 'decimal:2',
+        'p1' => 'decimal:2',
     ];
 
     /**
-     * Scope do filtrowania po dacie
+     * Scope do filtrowania po miesiącu
      */
-    public function scopeByDate($query, $startDate, $endDate = null)
+    public function scopeByMonth($query, $month)
     {
-        if ($endDate) {
-            return $query->whereBetween('data', [$startDate, $endDate]);
-        }
-        return $query->where('data', '>=', $startDate);
+        return $query->where('miesiac', $month);
     }
 
     /**
-     * Scope do filtrowania po kategorii
+     * Scope do filtrowania po roku
      */
-    public function scopeByCategory($query, $category)
+    public function scopeByYear($query, $year)
     {
-        return $query->where('kategoria', $category);
+        return $query->whereYear('miesiac', $year);
     }
 
     /**
-     * Scope do filtrowania po statusie
+     * Pobierz sumę wydatków w danym miesiącu
      */
-    public function scopeByStatus($query, $status)
+    public static function getTotalExpenses($month)
     {
-        return $query->where('status', $status);
+        return static::where('miesiac', $month)->sum('suma_oplat');
     }
 
     /**
-     * Scope do filtrowania po kwocie
+     * Pobierz średnie miesięczne wydatki
      */
-    public function scopeByAmount($query, $minAmount = null, $maxAmount = null)
+    public static function getAverageMonthlyExpenses()
     {
-        if ($minAmount && $maxAmount) {
-            return $query->whereBetween('kwota', [$minAmount, $maxAmount]);
-        } elseif ($minAmount) {
-            return $query->where('kwota', '>=', $minAmount);
-        } elseif ($maxAmount) {
-            return $query->where('kwota', '<=', $maxAmount);
-        }
-        return $query;
+        return static::avg('suma_oplat');
     }
 
     /**
-     * Pobierz sumę wydatków w danym okresie
+     * Pobierz wydatki pogrupowane po miesiącu
      */
-    public static function getTotalExpenses($startDate, $endDate = null)
+    public static function getMonthlyExpensesByCategory()
     {
-        $query = static::query();
-        return $query->byDate($startDate, $endDate)->sum('kwota');
-    }
-
-    /**
-     * Pobierz wydatki pogrupowane po kategorii
-     */
-    public static function getExpensesByCategory($startDate, $endDate = null)
-    {
-        $query = static::query();
-        return $query->byDate($startDate, $endDate)
-            ->selectRaw('kategoria, SUM(kwota) as total')
-            ->groupBy('kategoria')
-            ->orderBy('total', 'desc')
+        return static::selectRaw('YEAR(miesiac) as year, MONTH(miesiac) as month, SUM(suma_oplat) as total')
+            ->groupBy('year', 'month')
+            ->orderBy('year', 'desc')
+            ->orderBy('month', 'desc')
             ->get();
     }
 }

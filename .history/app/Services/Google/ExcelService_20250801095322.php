@@ -84,13 +84,11 @@ class ExcelService
             // Upload do Google Drive
             $uploadResult = $this->googleDriveService->uploadFile($tempPath, $fileName, $parentFolderId);
 
+            // Usuń tymczasowy plik
+            unlink($tempPath);
+
             if ($uploadResult === null) {
                 return null;
-            }
-
-            // Usuń tymczasowy plik
-            if (file_exists($tempPath)) {
-                unlink($tempPath);
             }
 
             return $uploadResult['id'];
@@ -143,9 +141,7 @@ class ExcelService
             $success = $this->googleDriveService->updateFile($fileId, $tempPath);
 
             // Usuń tymczasowy plik
-            if (file_exists($tempPath)) {
-                unlink($tempPath);
-            }
+            unlink($tempPath);
 
             return $success;
         } catch (Exception $e) {

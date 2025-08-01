@@ -50,6 +50,9 @@ class ExcelService
             // Pobierz dane
             $data = $this->extractDataFromWorksheet($worksheet, $range);
 
+            // Usuń tymczasowy plik
+            unlink($tempPath);
+
             return $data;
         } catch (Exception $e) {
             Log::error('Excel data extraction failed', [
@@ -84,13 +87,11 @@ class ExcelService
             // Upload do Google Drive
             $uploadResult = $this->googleDriveService->uploadFile($tempPath, $fileName, $parentFolderId);
 
+            // Usuń tymczasowy plik
+            unlink($tempPath);
+
             if ($uploadResult === null) {
                 return null;
-            }
-
-            // Usuń tymczasowy plik
-            if (file_exists($tempPath)) {
-                unlink($tempPath);
             }
 
             return $uploadResult['id'];
@@ -143,9 +144,7 @@ class ExcelService
             $success = $this->googleDriveService->updateFile($fileId, $tempPath);
 
             // Usuń tymczasowy plik
-            if (file_exists($tempPath)) {
-                unlink($tempPath);
-            }
+            unlink($tempPath);
 
             return $success;
         } catch (Exception $e) {
