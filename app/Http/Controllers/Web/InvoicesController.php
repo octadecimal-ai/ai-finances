@@ -111,7 +111,8 @@ class InvoicesController extends Controller
             ->values()
             ->toArray();
 
-        $invoices = $query->orderBy($sortColumn, $sortDirection)
+        $invoices = $query->with('transaction')
+            ->orderBy($sortColumn, $sortDirection)
             ->paginate($request->get('per_page', 15))
             ->withQueryString();
 
@@ -122,6 +123,18 @@ class InvoicesController extends Controller
             $invoice->netto_pln = $this->convertToPLN($invoice->subtotal, $invoice->currency, $invoiceDate);
             $invoice->vat_pln = $this->convertToPLN($invoice->tax_amount, $invoice->currency, $invoiceDate);
             $invoice->brutto_pln = $this->convertToPLN($invoice->total_amount, $invoice->currency, $invoiceDate);
+            
+            // Dodaj informacje o dopasowanej transakcji
+            if ($invoice->transaction) {
+                $invoice->matched_amount = abs($invoice->transaction->amount);
+                $invoice->matched_amount_currency = $invoice->transaction->currency;
+                $invoice->matched_date = $invoice->transaction->transaction_date ?? $invoice->transaction->booking_date;
+            } else {
+                $invoice->matched_amount = null;
+                $invoice->matched_amount_currency = null;
+                $invoice->matched_date = null;
+            }
+            
             return $invoice;
         });
 
@@ -180,6 +193,8 @@ class InvoicesController extends Controller
             'transaction_id' => 'ID transakcji',
             'match_score' => 'Poziom dopasowania',
             'matched_at' => 'Data dopasowania',
+            'matched_amount' => 'Kwota dopasowanej płatności',
+            'matched_date' => 'Data dopasowanej płatności',
             'file_name' => 'Plik',
             'source_type' => 'Źródło',
             'created_at' => 'Data utworzenia',

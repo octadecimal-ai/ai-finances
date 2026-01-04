@@ -401,6 +401,22 @@ document.addEventListener('DOMContentLoaded', function() {
                                             </div>
                                         @elseif($column === 'matched_at')
                                             <div class="text-sm">{{ $invoice->matched_at ? $invoice->matched_at->format('Y-m-d H:i') : '-' }}</div>
+                                        @elseif($column === 'matched_amount')
+                                            <div class="font-medium">
+                                                @if($invoice->matched_amount !== null)
+                                                    {{ number_format($invoice->matched_amount, 2, ',', ' ') }} {{ $invoice->matched_amount_currency ?? '-' }}
+                                                @else
+                                                    <span class="text-[#706f6c] dark:text-[#A1A09A]">-</span>
+                                                @endif
+                                            </div>
+                                        @elseif($column === 'matched_date')
+                                            <div class="text-sm">
+                                                @if($invoice->matched_date)
+                                                    {{ $invoice->matched_date->format('Y-m-d H:i') }}
+                                                @else
+                                                    <span class="text-[#706f6c] dark:text-[#A1A09A]">-</span>
+                                                @endif
+                                            </div>
                                         @elseif($column === 'file_name')
                                             <div class="text-sm">{{ $invoice->file_name ?? '-' }}</div>
                                         @elseif($column === 'source_type')
