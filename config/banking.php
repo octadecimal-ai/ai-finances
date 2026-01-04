@@ -29,7 +29,9 @@ return [
 
     'wfirma' => [
         'base_url' => env('WFIRMA_BASE_URL', 'https://api2.wfirma.pl'),
-        'access_token' => env('WFIRMA_ACCESS_TOKEN'),
+        'access_key' => env('WFIRMA_ACCESS_TOKEN'), // Access Key (może być w zmiennej ACCESS_TOKEN)
+        'secret_key' => env('WFIRMA_SECRET_KEY'),
+        'app_key' => env('WFIRMA_APP_KEY'),
         'company_id' => env('WFIRMA_COMPANY_ID'),
         'timeout' => env('WFIRMA_TIMEOUT', 30),
         'retry_attempts' => env('WFIRMA_RETRY_ATTEMPTS', 3),
