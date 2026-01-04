@@ -1,0 +1,4 @@
+Snapshot: snapshot_20250731_163000_utworzenie_serwisow_bankowych_nordigen_revolut_wfirma
+Opis: utworzenie_serwisow_bankowych_nordigen_revolut_wfirma
+Data: Thu Jul 31 16:30:00 CEST 2025
+Hash: f7fe0caef3e491488be3cadd0d0306eb76f8edcd

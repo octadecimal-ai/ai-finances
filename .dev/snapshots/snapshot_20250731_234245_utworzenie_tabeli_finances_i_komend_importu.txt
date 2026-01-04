@@ -1,0 +1,4 @@
+Snapshot: snapshot_20250731_234245_utworzenie_tabeli_finances_i_komend_importu
+Opis: utworzenie_tabeli_finances_i_komend_importu
+Data: Thu Jul 31 23:42:45 CEST 2025
+Hash: 9109eca98fca925d15ec11c3ff0f1b152389918a

@@ -1,0 +1,4 @@
+Snapshot: snapshot_20250731_232825_dodanie_testu_excel_google_drive
+Opis: dodanie_testu_excel_google_drive
+Data: Thu Jul 31 23:28:25 CEST 2025
+Hash: d3191fbf0bed7a69a03d37e7a09ade933b8aa050

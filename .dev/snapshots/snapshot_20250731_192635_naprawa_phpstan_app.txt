@@ -1,0 +1,4 @@
+Snapshot: snapshot_20250731_192635_naprawa_phpstan_app
+Opis: naprawa_phpstan_app
+Data: Thu Jul 31 19:26:35 CEST 2025
+Hash: 60469b3a91f0448ecbca2bd96d1e6e46962f9b4c

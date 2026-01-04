@@ -1,0 +1,4 @@
+Snapshot: snapshot_20250731_192929_migracje_2024_zmienione_na_20250731
+Opis: migracje_2024_zmienione_na_20250731
+Data: Thu Jul 31 19:29:29 CEST 2025
+Hash: bedf5729ecd6a6d35fb9a4111ce675570706a4b8

@@ -1,0 +1,4 @@
+Snapshot: snapshot_20250731_193030_migrate_fresh_wykonane
+Opis: migrate_fresh_wykonane
+Data: Thu Jul 31 19:30:30 CEST 2025
+Hash: bedf5729ecd6a6d35fb9a4111ce675570706a4b8

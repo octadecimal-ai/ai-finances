@@ -1,0 +1,4 @@
+Snapshot: snapshot_20250731_195745_google_api_stubs_installed
+Opis: google_api_stubs_installed
+Data: Thu Jul 31 19:57:45 CEST 2025
+Hash: 5ce308cb8f7050c08f564ff64803b3c346407bf2

@@ -1,0 +1,211 @@
+diff --git a/app/Services/Google/GoogleDriveService.php b/app/Services/Google/GoogleDriveService.php
+index 22e4193..5f557f2 100644
+--- a/app/Services/Google/GoogleDriveService.php
++++ b/app/Services/Google/GoogleDriveService.php
+@@ -19,7 +19,7 @@ class GoogleDriveService
+     
+     private string $applicationName;
+     private array $scopes;
+-    private string $credentialsPath;
++    private ?string $credentialsPath;
+     private string $tokenPath;
+ 
+     /**
+@@ -27,13 +27,15 @@ class GoogleDriveService
+      */
+     public function __construct()
+     {
+-        $this->applicationName = config('google.application_name', 'Finances App');
+-        $this->scopes = config('google.scopes', [
++        $this->applicationName = config('google.drive.application_name', 'Finances App');
++        $this->scopes = config('google.drive.scopes', [
+             'https://www.googleapis.com/auth/drive',
+             'https://www.googleapis.com/auth/drive.file',
+         ]);
+-        $this->credentialsPath = config('google.credentials_path');
+-        $this->tokenPath = storage_path('app/google/token.json');
++        
++        // Użyj credentials z konfiguracji zamiast pliku
++        $this->credentialsPath = null; // Będziemy używać credentials z config
++        $this->tokenPath = storage_path('app/google_token.json');
+ 
+         $this->initializeClient();
+     }
+@@ -48,37 +50,53 @@ private function initializeClient(): void
+             $this->client = new Client();
+             $this->client->setApplicationName($this->applicationName);
+             $this->client->setScopes($this->scopes);
+-            $this->client->setAuthConfig($this->credentialsPath);
+-            $this->client->setAccessType('offline');
+-            $this->client->setPrompt('select_account consent');
+-
+-            // Load previously authorized token from a cache
+-            if (file_exists($this->tokenPath)) {
+-                $tokenContent = file_get_contents($this->tokenPath);
+-                if ($tokenContent !== false) {
+-                    $accessToken = json_decode($tokenContent, true);
+-                    if ($accessToken !== null) {
+-                        $this->client->setAccessToken($accessToken);
++            
++            // Użyj credentials z konfiguracji
++            $credentials = config('google.credentials');
++            $credentialsType = config('google.credentials.type', 'service_account');
++            
++            if ($credentials && $credentialsType === 'service_account') {
++                // Service Account flow
++                $this->client->setAuthConfig($credentials);
++                
++                // For service account, we don't need to handle token refresh manually
++                // The client will handle it automatically
++            } else {
++                // OAuth flow
++                $this->client->setClientId(config('google.drive.client_id'));
++                $this->client->setClientSecret(config('google.drive.client_secret'));
++                $this->client->setRedirectUri(config('google.drive.redirect_uri'));
++                $this->client->setAccessType('offline');
++                $this->client->setPrompt('select_account consent');
++
++                // Load previously authorized token from a cache
++                if (file_exists($this->tokenPath)) {
++                    $tokenContent = file_get_contents($this->tokenPath);
++                    if ($tokenContent !== false) {
++                        $accessToken = json_decode($tokenContent, true);
++                        if ($accessToken !== null) {
++                            $this->client->setAccessToken($accessToken);
++                        }
+                     }
+                 }
+-            }
+ 
+-            // If there is no previous token or it has expired
+-            if ($this->client->isAccessTokenExpired()) {
+-                if ($this->client->getRefreshToken()) {
+-                    $this->client->fetchAccessTokenWithRefreshToken($this->client->getRefreshToken());
+-                } else {
+-                    // Request authorization from the user
+-                    $authUrl = $this->client->createAuthUrl();
+-                    Log::info('Google Drive authorization required', ['auth_url' => $authUrl]);
+-                    throw new \Exception('Google Drive authorization required. Please visit: ' . $authUrl);
+-                }
++                // If there is no previous token or it has expired
++                if ($this->client->isAccessTokenExpired()) {
++                    if ($this->client->getRefreshToken()) {
++                        $this->client->fetchAccessTokenWithRefreshToken($this->client->getRefreshToken());
++                    } else {
++                        // Request authorization from the user
++                        $authUrl = $this->client->createAuthUrl();
++                        Log::info('Google Drive authorization required', ['auth_url' => $authUrl]);
++                        throw new \Exception('Google Drive authorization required. Please visit: ' . $authUrl);
++                    }
+ 
+-                // Save the token to a file
+-                if (!is_dir(dirname($this->tokenPath))) {
+-                    mkdir(dirname($this->tokenPath), 0700, true);
++                    // Save the token to a file
++                    if (!is_dir(dirname($this->tokenPath))) {
++                        mkdir(dirname($this->tokenPath), 0700, true);
++                    }
++                    file_put_contents($this->tokenPath, json_encode($this->client->getAccessToken()));
+                 }
+-                file_put_contents($this->tokenPath, json_encode($this->client->getAccessToken()));
+             }
+ 
+             $this->service = new Drive($this->client);
+@@ -150,7 +168,7 @@ public function getUserInfo(): ?array
+             $user = $about->getUser();
+             
+             return [
+-                'id' => $user->getId() ?? null,
++                'id' => $user->getPermissionId() ?? null,
+                 'email' => $user->getEmailAddress() ?? null,
+                 'name' => $user->getDisplayName() ?? null,
+             ];
+@@ -199,12 +217,23 @@ public function uploadFile(string $filePath, string $fileName, ?string $parentFo
+             }
+ 
+             $content = file_get_contents($filePath);
+-            $file = $this->service->files->create($fileMetadata, [
++            
++            // Spróbuj użyć Shared Drive jeśli jest skonfigurowany
++            $sharedDriveId = config('google.drive.shared_drive_id');
++            $params = [
+                 'data' => $content,
+                 'mimeType' => mime_content_type($filePath),
+                 'uploadType' => 'multipart',
+                 'fields' => 'id,name,size,createdTime,modifiedTime,webViewLink'
+-            ]);
++            ];
++            
++            if ($sharedDriveId) {
++                $params['supportsAllDrives'] = true;
++                $params['includeItemsFromAllDrives'] = true;
++                $params['corpora'] = 'allDrives';
++            }
++            
++            $file = $this->service->files->create($fileMetadata, $params);
+ 
+             return [
+                 'id' => $file->getId(),
+@@ -231,10 +260,9 @@ public function uploadFile(string $filePath, string $fileName, ?string $parentFo
+     public function downloadFile(string $fileId, string $destinationPath): bool
+     {
+         try {
+-            $response = $this->service->files->get($fileId, [
++            $content = $this->service->files->get($fileId, [
+                 'alt' => 'media'
+             ]);
+-            $content = $response->getBody()->getContents();
+ 
+             return file_put_contents($destinationPath, $content) !== false;
+ 
+diff --git a/config/google.php b/config/google.php
+index 22f2d08..aea752c 100644
+--- a/config/google.php
++++ b/config/google.php
+@@ -11,9 +11,14 @@
+     */
+ 
+     'drive' => [
+-        'client_id' => env('GOOGLE_DRIVE_CLIENT_ID'),
++        'client_id' => env('GOOGLE_DRIVE_CLIENT_ID') ?: env('GOOGLE_DRIVE_CLIENT'),
+         'client_secret' => env('GOOGLE_DRIVE_CLIENT_SECRET'),
+         'redirect_uri' => env('GOOGLE_DRIVE_REDIRECT_URI'),
++        'shared_drive_id' => env('GOOGLE_DRIVE_SHARED_DRIVE_ID'),
++        'project_id' => env('GOOGLE_DRIVE_project_id'),
++        'auth_uri' => env('GOOGLE_DRIVE_auth_uri'),
++        'token_uri' => env('GOOGLE_DRIVE_token_uri'),
++        'auth_provider_x509_cert_url' => env('GOOGLE_DRIVE_auth_provider_x509_cert_url'),
+         'scopes' => [
+             'https://www.googleapis.com/auth/drive',
+             'https://www.googleapis.com/auth/drive.file',
+@@ -37,5 +42,8 @@
+         'client_id' => env('GOOGLE_CLIENT_ID'),
+         'auth_uri' => env('GOOGLE_AUTH_URI', 'https://accounts.google.com/o/oauth2/auth'),
+         'token_uri' => env('GOOGLE_TOKEN_URI', 'https://oauth2.googleapis.com/token'),
++        'auth_provider_x509_cert_url' => env('GOOGLE_AUTH_PROVIDER_X509_CERT_URL'),
++        'client_x509_cert_url' => env('GOOGLE_CLIENT_X509_CERT_URL'),
++        'universe_domain' => env('GOOGLE_UNIVERSE_DOMAIN'),
+     ],
+ ]; 
+\ No newline at end of file
+diff --git a/routes/web.php b/routes/web.php
+index 86a06c5..537ab9f 100644
+--- a/routes/web.php
++++ b/routes/web.php
+@@ -1,7 +1,16 @@
+ <?php
+ 
+ use Illuminate\Support\Facades\Route;
++use App\Http\Controllers\Web\GoogleAuthController;
+ 
+ Route::get('/', function () {
+     return view('welcome');
+ });
++
++// Google OAuth routes
++Route::prefix('auth/google')->name('google.')->group(function () {
++    Route::get('/redirect', [GoogleAuthController::class, 'redirect'])->name('redirect');
++    Route::get('/callback', [GoogleAuthController::class, 'callback'])->name('callback');
++    Route::get('/test', [GoogleAuthController::class, 'test'])->name('test');
++    Route::get('/status', [GoogleAuthController::class, 'status'])->name('status');
++});

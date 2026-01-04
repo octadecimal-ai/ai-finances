@@ -1,0 +1,4 @@
+Snapshot: snapshot_20250731_192830_migracje_prawdziwe_czasy
+Opis: migracje_prawdziwe_czasy
+Data: Thu Jul 31 19:28:30 CEST 2025
+Hash: e95e4a06e822e701d58a519a9798b2c0aac0c0ca

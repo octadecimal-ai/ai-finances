@@ -1,0 +1,4 @@
+Snapshot: snapshot_20250731_235414_import_danych_kredytow_z_google_sheets
+Opis: import_danych_kredytow_z_google_sheets
+Data: Thu Jul 31 23:54:14 CEST 2025
+Hash: 83587787b9a1ac440866832723061a07531f4fb2

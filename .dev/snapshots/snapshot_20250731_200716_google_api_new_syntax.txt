@@ -1,0 +1,4 @@
+Snapshot: snapshot_20250731_200716_google_api_new_syntax
+Opis: google_api_new_syntax
+Data: Thu Jul 31 20:07:16 CEST 2025
+Hash: 158060164e3249d7f34478a28641265c90c668c3

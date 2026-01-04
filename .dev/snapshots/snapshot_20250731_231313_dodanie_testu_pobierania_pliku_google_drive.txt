@@ -1,0 +1,4 @@
+Snapshot: snapshot_20250731_231313_dodanie_testu_pobierania_pliku_google_drive
+Opis: dodanie_testu_pobierania_pliku_google_drive
+Data: Thu Jul 31 23:13:13 CEST 2025
+Hash: e531466d015291a3839fed2a5a36b2023f275e56

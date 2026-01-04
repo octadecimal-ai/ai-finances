@@ -1,0 +1,4 @@
+Snapshot: snapshot_20250731_202328_env_variables_added
+Opis: env_variables_added
+Data: Thu Jul 31 20:23:28 CEST 2025
+Hash: 6cf8dc215226db6791ce9c55129db7b8a82510fb

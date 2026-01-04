@@ -1,0 +1,4 @@
+Snapshot: snapshot_20250731_184646_utworzenie_serwisow_google_drive_excel
+Opis: utworzenie_serwisow_google_drive_excel
+Data: Thu Jul 31 18:46:46 CEST 2025
+Hash: 77c1b9f3828975784975c37967a2f9cdde3ec3d7

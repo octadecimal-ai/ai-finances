@@ -1,0 +1,4 @@
+Snapshot: snapshot_20250731_160339_utworzenie_podstawowej_struktury_analizatora_finansow
+Opis: utworzenie_podstawowej_struktury_analizatora_finansow
+Data: Thu Jul 31 16:03:39 CEST 2025
+Hash: 0181a48aabfa5ef7dcd74f286638364f93164db6

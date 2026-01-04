@@ -1,0 +1,13 @@
+diff --git a/app/Services/Google/GoogleDriveService.php b/app/Services/Google/GoogleDriveService.php
+index 22e4193..0c1c7c8 100644
+--- a/app/Services/Google/GoogleDriveService.php
++++ b/app/Services/Google/GoogleDriveService.php
+@@ -150,7 +150,7 @@ public function getUserInfo(): ?array
+             $user = $about->getUser();
+             
+             return [
+-                'id' => $user->getId() ?? null,
++                'id' => $user->getPermissionId() ?? null,
+                 'email' => $user->getEmailAddress() ?? null,
+                 'name' => $user->getDisplayName() ?? null,
+             ];

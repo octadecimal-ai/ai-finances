@@ -41,6 +41,8 @@ show_help() {
     echo -e "  ${GREEN}--exchange-rates=2025${NC} - Import kursów walut dla konkretnego roku"
     echo -e "  ${GREEN}--exchange-rates=all${NC} - Import kursów walut ze wszystkich lat"
     echo -e "  ${GREEN}--match-transactions${NC} - Dopasuj faktury do transakcji"
+    echo -e "  ${GREEN}--wfirma=2025-12${NC}   - Synchronizacja danych z wFirma dla miesiąca (format: YYYY-MM)"
+    echo -e "  ${GREEN}--wfirma=2025${NC}      - Synchronizacja danych z wFirma dla całego roku (format: YYYY)"
     echo ""
     echo -e "${YELLOW}Przykłady:${NC}"
     echo "  ./import.sh --account=revoult"
@@ -54,6 +56,8 @@ show_help() {
     echo "  ./import.sh --exchange-rates=2025"
     echo "  ./import.sh --exchange-rates=all"
     echo "  ./import.sh --match-transactions"
+    echo "  ./import.sh --wfirma=2025-12"
+    echo "  ./import.sh --wfirma=2025"
     echo ""
     echo -e "${YELLOW}Mechanizm śledzenia:${NC}"
     echo "  Skrypt zapamiętuje zaimportowane pliki w pliku:"
@@ -351,6 +355,7 @@ main() {
     local invoices_type=""
     local exchange_rates_year=""
     local match_transactions=false
+    local wfirma_period=""
     for arg in "$@"; do
         case $arg in
             --account=*)
@@ -368,6 +373,9 @@ main() {
             --match-transactions)
                 match_transactions=true
                 ;;
+            --wfirma=*)
+                wfirma_period="${arg#*=}"
+                ;;
             --help|-h)
                 show_help
                 exit 0
@@ -381,9 +389,9 @@ main() {
         esac
     done
 
-    # Sprawdź czy podano typ konta, faktur, kursów walut lub dopasowanie transakcji
-    if [ -z "$account_type" ] && [ -z "$invoices_type" ] && [ -z "$exchange_rates_year" ] && [ "$match_transactions" = false ]; then
-        echo -e "${RED}❌ Musisz podać typ: --account=revoult, --invoices=cursor|anthropic|google|openai|all, --exchange-rates lub --match-transactions${NC}"
+    # Sprawdź czy podano typ konta, faktur, kursów walut, wFirma lub dopasowanie transakcji
+    if [ -z "$account_type" ] && [ -z "$invoices_type" ] && [ -z "$exchange_rates_year" ] && [ "$match_transactions" = false ] && [ -z "$wfirma_period" ]; then
+        echo -e "${RED}❌ Musisz podać typ: --account=revoult, --invoices=cursor|anthropic|google|openai|all, --exchange-rates, --wfirma=YYYY-MM|YYYY lub --match-transactions${NC}"
         echo ""
         show_help
         exit 1
@@ -402,7 +410,29 @@ main() {
     fi
 
     # Importuj w zależności od typu
-    if [ "$match_transactions" = true ]; then
+    if [ -n "$wfirma_period" ]; then
+        # Synchronizacja danych z wFirma
+        echo -e "${CYAN}🔄 Synchronizacja danych z wFirma${NC}"
+        echo ""
+        
+        cd "$PROJECT_ROOT" || exit 1
+        
+        php artisan wfirma:sync "$wfirma_period" --user-id=1 2>&1 | while IFS= read -r line; do
+            if [[ "$line" == *"✅"* ]] || [[ "$line" == *"Zsynchronizowano"* ]] || [[ "$line" == *"zakończona"* ]]; then
+                echo -e "${GREEN}$line${NC}"
+            elif [[ "$line" == *"❌"* ]] || [[ "$line" == *"Błąd"* ]] || [[ "$line" == *"Error"* ]]; then
+                echo -e "${RED}$line${NC}"
+            elif [[ "$line" == *"⚠️"* ]] || [[ "$line" == *"Warning"* ]]; then
+                echo -e "${YELLOW}$line${NC}"
+            else
+                echo -e "$line"
+            fi
+        done
+        
+        echo ""
+        echo -e "${GREEN}✅ Synchronizacja zakończona${NC}"
+        echo ""
+    elif [ "$match_transactions" = true ]; then
         # Dopasuj faktury do transakcji
         echo -e "${CYAN}🔗 Dopasowywanie faktur do transakcji${NC}"
         echo ""

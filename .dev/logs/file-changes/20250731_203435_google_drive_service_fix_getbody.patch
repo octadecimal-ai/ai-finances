@@ -1,0 +1,25 @@
+diff --git a/app/Services/Google/GoogleDriveService.php b/app/Services/Google/GoogleDriveService.php
+index 22e4193..bc197ed 100644
+--- a/app/Services/Google/GoogleDriveService.php
++++ b/app/Services/Google/GoogleDriveService.php
+@@ -150,7 +150,7 @@ public function getUserInfo(): ?array
+             $user = $about->getUser();
+             
+             return [
+-                'id' => $user->getId() ?? null,
++                'id' => $user->getPermissionId() ?? null,
+                 'email' => $user->getEmailAddress() ?? null,
+                 'name' => $user->getDisplayName() ?? null,
+             ];
+@@ -231,10 +231,9 @@ public function uploadFile(string $filePath, string $fileName, ?string $parentFo
+     public function downloadFile(string $fileId, string $destinationPath): bool
+     {
+         try {
+-            $response = $this->service->files->get($fileId, [
++            $content = $this->service->files->get($fileId, [
+                 'alt' => 'media'
+             ]);
+-            $content = $response->getBody()->getContents();
+ 
+             return file_put_contents($destinationPath, $content) !== false;
+ 

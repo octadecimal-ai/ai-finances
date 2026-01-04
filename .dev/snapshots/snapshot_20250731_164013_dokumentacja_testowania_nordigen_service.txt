@@ -1,0 +1,4 @@
+Snapshot: snapshot_20250731_164013_dokumentacja_testowania_nordigen_service
+Opis: dokumentacja_testowania_nordigen_service
+Data: Thu Jul 31 16:40:13 CEST 2025
+Hash: 189e769f706125ec926e9ff4f875cb3679c35fb3

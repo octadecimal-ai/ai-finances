@@ -150,124 +150,12 @@ class WFirmaService
     }
 
     /**
-     * Pobiera faktury z wFirma
+     * Pobiera faktury sprzedażowe z wFirma
      */
     public function getInvoices(array $filters = []): array
     {
         try {
-            // wFirma używa endpointu /invoices/find dla wyszukiwania
-            // Dla filtrowania po dacie trzeba użyć struktury XML/JSON z conditions
-            $requestData = [];
-            
-            // Jeśli są filtry daty, użyj struktury conditions
-            if (isset($filters['date_from']) || isset($filters['date_to'])) {
-                $conditions = [];
-                
-                if (isset($filters['date_from'])) {
-                    $conditions[] = [
-                        'field' => 'date',
-                        'operator' => 'ge', // greater or equal
-                        'value' => $filters['date_from'],
-                    ];
-                }
-                
-                if (isset($filters['date_to'])) {
-                    $conditions[] = [
-                        'field' => 'date',
-                        'operator' => 'le', // less or equal
-                        'value' => $filters['date_to'],
-                    ];
-                }
-                
-                // wFirma wymaga struktury: invoices > parameters > conditions > condition[]
-                // (api wrapper jest dodawany automatycznie)
-                $requestData = [
-                    'invoices' => [
-                        'parameters' => [
-                            'conditions' => [
-                                'condition' => $conditions,
-                            ],
-                        ],
-                    ],
-                ];
-                
-                // Dodaj limit jeśli jest
-                if (isset($filters['limit'])) {
-                    $requestData['invoices']['parameters']['limit'] = $filters['limit'];
-                }
-            } else {
-                // Bez filtrów daty - użyj prostych parametrów
-                if (isset($filters['limit'])) {
-                    $requestData = [
-                        'invoices' => [
-                            'parameters' => [
-                                'limit' => $filters['limit'],
-                            ],
-                        ],
-                    ];
-                }
-            }
-            
-            // wFirma wymaga POST dla find z conditions, GET dla prostych zapytań
-            $method = !empty($requestData) && isset($requestData['invoices']['parameters']['conditions']) ? 'POST' : 'GET';
-            
-            // Debug: loguj request data (tylko w development)
-            if (config('app.debug')) {
-                Log::debug('wFirma getInvoices request', [
-                    'method' => $method,
-                    'endpoint' => '/invoices/find',
-                    'request_data' => $requestData,
-                    'filters' => $filters,
-                ]);
-            }
-            
-            $response = $this->makeRequest($method, '/invoices/find', $requestData);
-            
-            // Debug: loguj response (tylko w development)
-            if (config('app.debug')) {
-                Log::debug('wFirma getInvoices response', [
-                    'response_keys' => $response ? array_keys($response) : [],
-                    'has_invoices' => isset($response['invoices']),
-                    'status' => $response['status'] ?? null,
-                    'response_sample' => $response ? json_encode(array_slice($response, 0, 3)) : null,
-                ]);
-            }
-            
-            // Sprawdź status odpowiedzi
-            if ($response && isset($response['status'])) {
-                $status = $response['status'];
-                $code = is_array($status) ? ($status['code'] ?? null) : $status;
-                
-                if ($code && $code !== 'OK') {
-                    Log::warning('wFirma getInvoices status', [
-                        'status_code' => $code,
-                        'full_status' => $status,
-                    ]);
-                }
-            }
-
-            if ($response && isset($response['invoices'])) {
-                // wFirma zwraca faktury w strukturze: invoices > invoice (może być tablica lub pojedynczy obiekt)
-                $invoices = $response['invoices'];
-                
-                // Jeśli jest pole 'invoice' (pojedyncza faktura lub tablica)
-                if (isset($invoices['invoice'])) {
-                    $invoice = $invoices['invoice'];
-                    // Jeśli to tablica z indeksami numerycznymi
-                    if (isset($invoice[0])) {
-                        return $invoice;
-                    }
-                    // Jeśli to pojedyncza faktura
-                    return [$invoice];
-                }
-                
-                // Jeśli faktury są bezpośrednio w tablicy
-                if (is_array($invoices)) {
-                    return $invoices;
-                }
-            }
-
-            return [];
+            return $this->findModuleData('invoices', 'invoice', $filters);
         } catch (Exception $e) {
             Log::error('wFirma getInvoices error', [
                 'error' => $e->getMessage(),
@@ -278,21 +166,16 @@ class WFirmaService
     }
 
     /**
-     * Pobiera wydatki z wFirma
+     * Pobiera wydatki (faktury wydatkowe) z wFirma
      */
     public function getExpenses(array $filters = []): array
     {
         try {
-            $response = $this->makeRequest('GET', '/expenses', $filters);
-
-            if ($response && isset($response['expenses'])) {
-                return $response['expenses'];
-            }
-
-            return [];
+            return $this->findModuleData('expenses', 'expense', $filters);
         } catch (Exception $e) {
             Log::error('wFirma getExpenses error', [
                 'error' => $e->getMessage(),
+                'filters' => $filters,
             ]);
             return [];
         }
@@ -304,18 +187,418 @@ class WFirmaService
     public function getIncomes(array $filters = []): array
     {
         try {
-            $response = $this->makeRequest('GET', '/incomes', $filters);
-
-            if ($response && isset($response['incomes'])) {
-                return $response['incomes'];
-            }
-
-            return [];
+            return $this->findModuleData('incomes', 'income', $filters);
         } catch (Exception $e) {
             Log::error('wFirma getIncomes error', [
                 'error' => $e->getMessage(),
+                'filters' => $filters,
             ]);
             return [];
+        }
+    }
+
+    /**
+     * Pobiera rozliczenia podatkowe JPK_VAT z wFirma
+     */
+    public function getTaxDeclarationsVat(array $filters = []): array
+    {
+        try {
+            return $this->findModuleData('declaration_body_jpkvat', 'declaration_body_jpkvat', $filters);
+        } catch (Exception $e) {
+            Log::error('wFirma getTaxDeclarationsVat error', [
+                'error' => $e->getMessage(),
+                'filters' => $filters,
+            ]);
+            return [];
+        }
+    }
+
+    /**
+     * Pobiera rozliczenia podatkowe PIT z wFirma
+     */
+    public function getTaxDeclarationsPit(array $filters = []): array
+    {
+        try {
+            return $this->findModuleData('declaration_body_pit', 'declaration_body_pit', $filters);
+        } catch (Exception $e) {
+            Log::error('wFirma getTaxDeclarationsPit error', [
+                'error' => $e->getMessage(),
+                'filters' => $filters,
+            ]);
+            return [];
+        }
+    }
+
+    /**
+     * Pobiera wszystkie rozliczenia podatkowe (VAT i PIT) z wFirma
+     */
+    public function getTaxDeclarations(array $filters = []): array
+    {
+        try {
+            $vatDeclarations = $this->getTaxDeclarationsVat($filters);
+            $pitDeclarations = $this->getTaxDeclarationsPit($filters);
+            
+            return [
+                'vat' => $vatDeclarations,
+                'pit' => $pitDeclarations,
+            ];
+        } catch (Exception $e) {
+            Log::error('wFirma getTaxDeclarations error', [
+                'error' => $e->getMessage(),
+                'filters' => $filters,
+            ]);
+            return ['vat' => [], 'pit' => []];
+        }
+    }
+
+    /**
+     * Pobiera rozliczenia ZUS z wFirma
+     * 
+     * Uwaga: wFirma API nie posiada dedykowanego modułu dla rozliczeń ZUS.
+     * Rozliczenia ZUS są dostępne w module Kadry i Płace, który może wymagać
+     * dodatkowych uprawnień i może nie być dostępny przez standardowe API.
+     * 
+     * W przypadku gdy ZUS jest dostępny, może być w module 'interests' lub
+     * wymagać bezpośredniej integracji z e-ZUS/PUE.
+     * 
+     * @param array $filters Filtry daty (date_from, date_to) i limit
+     * @return array Pusta tablica lub dane z modułu interests jeśli dostępne
+     */
+    public function getZusDeclarations(array $filters = []): array
+    {
+        try {
+            // Próba 1: Sprawdź czy ZUS jest w module 'interests'
+            // (interests może zawierać różne rodzaje rozliczeń)
+            try {
+                // Moduł interests może nie obsługiwać filtrowania po date poprawnie
+                // Pobierz wszystkie rozliczenia i przefiltruj lokalnie jeśli są filtry daty
+                if (isset($filters['date_from']) || isset($filters['date_to'])) {
+                    // Pobierz wszystkie rozliczenia (z limitem) i przefiltruj lokalnie
+                    $allInterests = $this->findModuleData('interests', 'interest', ['limit' => 1000]);
+                    
+                    if (!empty($allInterests)) {
+                        $filtered = [];
+                        $fromDate = $filters['date_from'] ?? '1900-01-01';
+                        $toDate = $filters['date_to'] ?? '2099-12-31';
+                        
+                        foreach ($allInterests as $interest) {
+                            // Sprawdź czy data pasuje do zakresu
+                            $interestDate = null;
+                            if (isset($interest['date'])) {
+                                $interestDate = $interest['date'];
+                            } elseif (isset($interest['period'])) {
+                                // Period w formacie YYYY-MM, użyj pierwszego dnia miesiąca
+                                $period = $interest['period'];
+                                if (preg_match('/^(\d{4})-(\d{2})$/', $period, $matches)) {
+                                    $interestDate = $matches[1] . '-' . $matches[2] . '-01';
+                                }
+                            }
+                            
+                            if ($interestDate && $interestDate >= $fromDate && $interestDate <= $toDate) {
+                                $filtered[] = $interest;
+                            }
+                        }
+                        
+                        if (!empty($filtered)) {
+                            Log::info('wFirma getZusDeclarations - znaleziono dane w module interests (przefiltrowane)', [
+                                'count' => count($filtered),
+                                'total' => count($allInterests),
+                            ]);
+                            return $filtered;
+                        }
+                    }
+                } else {
+                    // Bez filtrów daty - użyj standardowego podejścia
+                    $interests = $this->findModuleData('interests', 'interest', $filters);
+                    
+                    if (!empty($interests)) {
+                        Log::info('wFirma getZusDeclarations - znaleziono dane w module interests', [
+                            'count' => count($interests),
+                        ]);
+                        return $interests;
+                    }
+                }
+            } catch (Exception $e) {
+                Log::debug('wFirma getZusDeclarations - module interests nie zwrócił danych', [
+                    'error' => $e->getMessage(),
+                ]);
+            }
+
+            // Jeśli nie znaleziono danych, zwróć pustą tablicę
+            Log::info('wFirma getZusDeclarations - brak danych ZUS w dostępnych modułach API');
+            return [];
+        } catch (Exception $e) {
+            Log::error('wFirma getZusDeclarations error', [
+                'error' => $e->getMessage(),
+                'filters' => $filters,
+            ]);
+            return [];
+        }
+    }
+
+    /**
+     * Pobiera płatności z wFirma
+     * 
+     * @param array $filters Filtry daty (date_from, date_to), limit, invoice_id, expense_id, income_id
+     * @return array Lista płatności
+     */
+    public function getPayments(array $filters = []): array
+    {
+        try {
+            return $this->findModuleData('payments', 'payment', $filters);
+        } catch (Exception $e) {
+            Log::error('wFirma getPayments error', [
+                'error' => $e->getMessage(),
+                'filters' => $filters,
+            ]);
+            return [];
+        }
+    }
+
+    /**
+     * Pobiera terminy (terminarz) z wFirma
+     * 
+     * @param array $filters Filtry daty (date_from, date_to), limit, invoice_id, expense_id, income_id
+     * @return array Lista terminów
+     */
+    public function getTerms(array $filters = []): array
+    {
+        try {
+            return $this->findModuleData('terms', 'term', $filters);
+        } catch (Exception $e) {
+            Log::error('wFirma getTerms error', [
+                'error' => $e->getMessage(),
+                'filters' => $filters,
+            ]);
+            return [];
+        }
+    }
+
+    /**
+     * Pobiera zawartość faktury (pozycje faktury) z wFirma
+     * 
+     * @param string|int $invoiceId ID faktury w wFirma
+     * @return array Lista pozycji faktury
+     */
+    public function getInvoiceContents(string|int $invoiceId): array
+    {
+        try {
+            $response = $this->makeRequest('GET', "/invoices/{$invoiceId}");
+            
+            if ($response && isset($response['invoice']['invoicecontents'])) {
+                $contents = $response['invoice']['invoicecontents'];
+                
+                // Jeśli to tablica z indeksami numerycznymi
+                if (isset($contents['invoicecontent'])) {
+                    $content = $contents['invoicecontent'];
+                    if (isset($content[0])) {
+                        return $content;
+                    }
+                    return [$content];
+                }
+                
+                // Jeśli pozycje są bezpośrednio w tablicy
+                if (is_array($contents)) {
+                    return $contents;
+                }
+            }
+            
+            return [];
+        } catch (Exception $e) {
+            Log::error('wFirma getInvoiceContents error', [
+                'error' => $e->getMessage(),
+                'invoice_id' => $invoiceId,
+            ]);
+            return [];
+        }
+    }
+
+    /**
+     * Pobiera części wydatku (pozycje wydatku) z wFirma
+     * 
+     * @param string|int $expenseId ID wydatku w wFirma
+     * @return array Lista pozycji wydatku
+     */
+    public function getExpenseParts(string|int $expenseId): array
+    {
+        try {
+            $response = $this->makeRequest('GET', "/expenses/{$expenseId}");
+            
+            if ($response && isset($response['expense']['expense_parts'])) {
+                $parts = $response['expense']['expense_parts'];
+                
+                // Jeśli to tablica z indeksami numerycznymi
+                if (isset($parts['expense_part'])) {
+                    $part = $parts['expense_part'];
+                    if (isset($part[0])) {
+                        return $part;
+                    }
+                    return [$part];
+                }
+                
+                // Jeśli pozycje są bezpośrednio w tablicy
+                if (is_array($parts)) {
+                    return $parts;
+                }
+            }
+            
+            return [];
+        } catch (Exception $e) {
+            Log::error('wFirma getExpenseParts error', [
+                'error' => $e->getMessage(),
+                'expense_id' => $expenseId,
+            ]);
+            return [];
+        }
+    }
+
+    /**
+     * Pobiera pojedynczą fakturę sprzedażową z wFirma
+     * 
+     * @param string|int $invoiceId ID faktury w wFirma
+     * @return array|null Dane faktury lub null jeśli nie znaleziono
+     */
+    public function getInvoice(string|int $invoiceId): ?array
+    {
+        try {
+            $response = $this->makeRequest('GET', "/invoices/{$invoiceId}");
+            
+            if ($response && isset($response['invoice'])) {
+                return $response['invoice'];
+            }
+            
+            return null;
+        } catch (Exception $e) {
+            Log::error('wFirma getInvoice error', [
+                'error' => $e->getMessage(),
+                'invoice_id' => $invoiceId,
+            ]);
+            return null;
+        }
+    }
+
+    /**
+     * Pobiera pojedynczy wydatek z wFirma
+     * 
+     * @param string|int $expenseId ID wydatku w wFirma
+     * @return array|null Dane wydatku lub null jeśli nie znaleziono
+     */
+    public function getExpense(string|int $expenseId): ?array
+    {
+        try {
+            $response = $this->makeRequest('GET', "/expenses/{$expenseId}");
+            
+            if ($response && isset($response['expense'])) {
+                return $response['expense'];
+            }
+            
+            return null;
+        } catch (Exception $e) {
+            Log::error('wFirma getExpense error', [
+                'error' => $e->getMessage(),
+                'expense_id' => $expenseId,
+            ]);
+            return null;
+        }
+    }
+
+    /**
+     * Pobiera pojedynczy przychód z wFirma
+     * 
+     * @param string|int $incomeId ID przychodu w wFirma
+     * @return array|null Dane przychodu lub null jeśli nie znaleziono
+     */
+    public function getIncome(string|int $incomeId): ?array
+    {
+        try {
+            $response = $this->makeRequest('GET', "/incomes/{$incomeId}");
+            
+            if ($response && isset($response['income'])) {
+                return $response['income'];
+            }
+            
+            return null;
+        } catch (Exception $e) {
+            Log::error('wFirma getIncome error', [
+                'error' => $e->getMessage(),
+                'income_id' => $incomeId,
+            ]);
+            return null;
+        }
+    }
+
+    /**
+     * Pobiera pojedynczą płatność z wFirma
+     * 
+     * @param string|int $paymentId ID płatności w wFirma
+     * @return array|null Dane płatności lub null jeśli nie znaleziono
+     */
+    public function getPayment(string|int $paymentId): ?array
+    {
+        try {
+            $response = $this->makeRequest('GET', "/payments/{$paymentId}");
+            
+            if ($response && isset($response['payment'])) {
+                return $response['payment'];
+            }
+            
+            return null;
+        } catch (Exception $e) {
+            Log::error('wFirma getPayment error', [
+                'error' => $e->getMessage(),
+                'payment_id' => $paymentId,
+            ]);
+            return null;
+        }
+    }
+
+    /**
+     * Pobiera pojedynczy termin z wFirma
+     * 
+     * @param string|int $termId ID terminu w wFirma
+     * @return array|null Dane terminu lub null jeśli nie znaleziono
+     */
+    public function getTerm(string|int $termId): ?array
+    {
+        try {
+            $response = $this->makeRequest('GET', "/terms/{$termId}");
+            
+            if ($response && isset($response['term'])) {
+                return $response['term'];
+            }
+            
+            return null;
+        } catch (Exception $e) {
+            Log::error('wFirma getTerm error', [
+                'error' => $e->getMessage(),
+                'term_id' => $termId,
+            ]);
+            return null;
+        }
+    }
+
+    /**
+     * Pobiera pojedyncze rozliczenie ZUS z wFirma
+     * 
+     * @param string|int $interestId ID rozliczenia w wFirma
+     * @return array|null Dane rozliczenia lub null jeśli nie znaleziono
+     */
+    public function getInterest(string|int $interestId): ?array
+    {
+        try {
+            $response = $this->makeRequest('GET', "/interests/{$interestId}");
+            
+            if ($response && isset($response['interest'])) {
+                return $response['interest'];
+            }
+            
+            return null;
+        } catch (Exception $e) {
+            Log::error('wFirma getInterest error', [
+                'error' => $e->getMessage(),
+                'interest_id' => $interestId,
+            ]);
+            return null;
         }
     }
 
@@ -620,6 +903,128 @@ class WFirmaService
         }
     }
 
+
+    /**
+     * Uniwersalna metoda do pobierania danych z modułu wFirma z filtrowaniem
+     * 
+     * @param string $moduleName Nazwa modułu wFirma (np. 'invoices', 'expenses', 'payments')
+     * @param string $itemName Nazwa pojedynczego elementu w odpowiedzi (np. 'invoice', 'expense', 'payment')
+     * @param array $filters Filtry: date_from, date_to, limit, oraz dodatkowe filtry specyficzne dla modułu
+     * @return array Lista elementów
+     */
+    private function findModuleData(string $moduleName, string $itemName, array $filters = []): array
+    {
+        $requestData = [];
+        $conditions = [];
+        $hasConditions = false;
+        
+        // Filtry daty
+        if (isset($filters['date_from'])) {
+            $conditions[] = [
+                'field' => 'date',
+                'operator' => 'ge', // greater or equal
+                'value' => $filters['date_from'],
+            ];
+            $hasConditions = true;
+        }
+        
+        if (isset($filters['date_to'])) {
+            $conditions[] = [
+                'field' => 'date',
+                'operator' => 'le', // less or equal
+                'value' => $filters['date_to'],
+            ];
+            $hasConditions = true;
+        }
+        
+        // Dodatkowe filtry specyficzne dla modułu (np. invoice_id, expense_id, income_id)
+        $additionalFilters = ['invoice_id', 'expense_id', 'income_id', 'contractor_id', 'paymentstate', 'paid', 'type', 'period', 'zus_type'];
+        foreach ($additionalFilters as $filterKey) {
+            if (isset($filters[$filterKey])) {
+                $conditions[] = [
+                    'field' => $filterKey,
+                    'operator' => 'eq', // equal
+                    'value' => $filters[$filterKey],
+                ];
+                $hasConditions = true;
+            }
+        }
+        
+        // Jeśli są warunki, użyj struktury conditions
+        if ($hasConditions) {
+            $requestData = [
+                $moduleName => [
+                    'parameters' => [
+                        'conditions' => [
+                            'condition' => $conditions,
+                        ],
+                    ],
+                ],
+            ];
+            
+            // Dodaj limit jeśli jest
+            if (isset($filters['limit'])) {
+                $requestData[$moduleName]['parameters']['limit'] = $filters['limit'];
+            }
+        } else {
+            // Bez warunków - użyj prostych parametrów
+            if (isset($filters['limit'])) {
+                $requestData = [
+                    $moduleName => [
+                        'parameters' => [
+                            'limit' => $filters['limit'],
+                        ],
+                    ],
+                ];
+            }
+        }
+        
+        // wFirma wymaga POST dla find z conditions, GET dla prostych zapytań
+        $method = $hasConditions ? 'POST' : 'GET';
+        
+        $response = $this->makeRequest($method, "/{$moduleName}/find", $requestData);
+        
+        // Sprawdź status odpowiedzi
+        if ($response && isset($response['status'])) {
+            $status = $response['status'];
+            $code = is_array($status) ? ($status['code'] ?? null) : $status;
+            
+            if ($code && $code !== 'OK') {
+                Log::warning("wFirma {$moduleName} status", [
+                    'status_code' => $code,
+                    'full_status' => $status,
+                ]);
+            }
+        }
+        
+        if ($response && isset($response[$moduleName])) {
+            $items = $response[$moduleName];
+            
+            // Sprawdź czy to tylko metadane (parameters) bez danych
+            if (isset($items['parameters']) && !isset($items[$itemName])) {
+                // Brak danych - zwróć pustą tablicę
+                return [];
+            }
+            
+            // Jeśli jest pole z nazwą pojedynczej pozycji (np. 'expense', 'invoice')
+            if (isset($items[$itemName])) {
+                $item = $items[$itemName];
+                // Jeśli to tablica z indeksami numerycznymi
+                if (isset($item[0])) {
+                    return $item;
+                }
+                // Jeśli to pojedyncza pozycja
+                return [$item];
+            }
+            
+            // Jeśli pozycje są bezpośrednio w tablicy (ale nie parameters)
+            if (is_array($items) && !isset($items['parameters'])) {
+                return $items;
+            }
+        }
+        
+        return [];
+    }
 
     /**
      * Konwertuje tablicę na XML dla wFirma API
