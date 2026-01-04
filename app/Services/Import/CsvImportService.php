@@ -33,10 +33,16 @@ class CsvImportService
             'balance' => 3,
         ],
         'revolut' => [
-            'date' => 0,
-            'description' => 1,
-            'amount' => 2,
-            'currency' => 3,
+            'rodzaj' => 0,           // Rodzaj transakcji (Płatność kartą, Wymiana, etc.)
+            'produkt' => 1,          // Produkt (Bieżące, etc.)
+            'data_rozpoczecia' => 2, // Data rozpoczęcia
+            'data_zrealizowania' => 3, // Data zrealizowania
+            'opis' => 4,            // Opis
+            'kwota' => 5,           // Kwota
+            'oplata' => 6,          // Opłata
+            'waluta' => 7,          // Waluta
+            'state' => 8,           // State (ZAKOŃCZONO, etc.)
+            'saldo' => 9,           // Saldo
         ],
     ];
 
@@ -116,10 +122,22 @@ class CsvImportService
         $content = file_get_contents($file->getPathname());
         
         // Detect encoding
-        $encoding = mb_detect_encoding($content, ['UTF-8', 'ISO-8859-2', 'Windows-1250'], true);
+        $encodings = ['UTF-8', 'ISO-8859-2'];
+        // Windows-1250 może nie być dostępne w PHP 8.5, sprawdź czy jest dostępne
+        if (function_exists('mb_list_encodings')) {
+            $availableEncodings = mb_list_encodings();
+            if (in_array('Windows-1250', $availableEncodings)) {
+                $encodings[] = 'Windows-1250';
+            }
+        }
         
-        if ($encoding !== 'UTF-8') {
+        $encoding = mb_detect_encoding($content, $encodings, true);
+        
+        if ($encoding && $encoding !== 'UTF-8') {
             $content = mb_convert_encoding($content, 'UTF-8', $encoding);
+        } elseif (!$encoding) {
+            // Jeśli nie można wykryć, załóż UTF-8
+            $encoding = 'UTF-8';
         }
 
         $lines = explode("\n", $content);
@@ -128,7 +146,9 @@ class CsvImportService
         foreach ($lines as $line) {
             $line = trim($line);
             if (!empty($line)) {
-                $csvData[] = str_getcsv($line, ';');
+                // Revolut używa przecinka jako separatora, inne banki średnika
+                $delimiter = strpos($line, ',') !== false ? ',' : ';';
+                $csvData[] = str_getcsv($line, $delimiter);
             }
         }
 
@@ -143,7 +163,7 @@ class CsvImportService
             'mbank' => ['data operacji', 'data', 'date'],
             'ing' => ['data operacji', 'data', 'date'],
             'pko' => ['data operacji', 'data', 'date'],
-            'revolut' => ['date', 'data', 'completed date'],
+            'revolut' => ['rodzaj', 'produkt', 'data rozpoczęcia', 'data zrealizowania', 'opis', 'kwota', 'opłata', 'waluta', 'state', 'saldo'],
         ];
 
         $patterns = $headerPatterns[$format] ?? [];
@@ -159,10 +179,14 @@ class CsvImportService
 
     private function parseRow(array $row, array $formatConfig, string $format): array
     {
+        if ($format === 'revolut') {
+            return $this->parseRevolutRow($row, $formatConfig);
+        }
+
         $date = $this->parseDate($row[$formatConfig['date']] ?? '');
         $description = trim($row[$formatConfig['description']] ?? '');
         $amount = $this->parseAmount($row[$formatConfig['amount']] ?? '', $format);
-        $currency = $format === 'revolut' ? ($row[$formatConfig['currency']] ?? 'EUR') : 'PLN';
+        $currency = 'PLN';
 
         if (empty($date) || empty($description)) {
             throw new Exception('Brak wymaganych danych: data lub opis');
@@ -179,6 +203,97 @@ class CsvImportService
         ];
     }
 
+    private function parseRevolutRow(array $row, array $formatConfig): array
+    {
+        $rodzaj = trim($row[$formatConfig['rodzaj']] ?? '');
+        $produkt = trim($row[$formatConfig['produkt']] ?? '');
+        $dataRozpoczecia = $this->parseDate($row[$formatConfig['data_rozpoczecia']] ?? '');
+        $dataZrealizowania = $this->parseDate($row[$formatConfig['data_zrealizowania']] ?? '');
+        $opis = trim($row[$formatConfig['opis']] ?? '');
+        $kwota = $this->parseAmount($row[$formatConfig['kwota']] ?? '', 'revolut');
+        $oplata = $this->parseAmount($row[$formatConfig['oplata']] ?? '', 'revolut');
+        $waluta = trim($row[$formatConfig['waluta']] ?? 'PLN');
+        $state = trim($row[$formatConfig['state']] ?? '');
+        $saldo = $this->parseAmount($row[$formatConfig['saldo']] ?? '', 'revolut');
+
+        if (empty($dataRozpoczecia) || empty($opis)) {
+            throw new Exception('Brak wymaganych danych: data rozpoczęcia lub opis');
+        }
+
+        // Określ typ transakcji na podstawie Rodzaj i Kwoty
+        $type = $this->determineRevolutType($rodzaj, $kwota);
+        
+        // Określ status na podstawie State
+        $status = $this->parseRevolutStatus($state);
+
+        // Przygotuj metadata z dodatkowymi danymi
+        $metadata = [
+            'rodzaj' => $rodzaj,
+            'produkt' => $produkt,
+            'oplata' => $oplata,
+            'state' => $state,
+        ];
+
+        return [
+            'transaction_date' => $dataRozpoczecia,
+            'booking_date' => $dataZrealizowania ?: $dataRozpoczecia,
+            'value_date' => $dataZrealizowania ?: $dataRozpoczecia,
+            'description' => $opis,
+            'amount' => $kwota,
+            'currency' => $waluta,
+            'type' => $type,
+            'status' => $status,
+            'balance_after' => $saldo,
+            'metadata' => $metadata,
+            'provider' => 'revolut',
+            'is_imported' => true,
+        ];
+    }
+
+    private function determineRevolutType(string $rodzaj, float $amount): string
+    {
+        // Określ typ na podstawie Rodzaj i znaku kwoty
+        $rodzajLower = strtolower($rodzaj);
+        
+        // Jeśli kwota jest dodatnia, to credit (wpływ)
+        if ($amount > 0) {
+            return 'credit';
+        }
+        
+        // Jeśli kwota jest ujemna, to debit (wydatek)
+        if ($amount < 0) {
+            return 'debit';
+        }
+        
+        // Domyślnie na podstawie rodzaju
+        if (strpos($rodzajLower, 'wymiana') !== false || 
+            strpos($rodzajLower, 'top up') !== false ||
+            strpos($rodzajLower, 'przelew') !== false) {
+            return $amount >= 0 ? 'credit' : 'debit';
+        }
+        
+        return 'debit';
+    }
+
+    private function parseRevolutStatus(string $state): string
+    {
+        $stateLower = strtolower(trim($state));
+        
+        if ($stateLower === 'zakończono' || $stateLower === 'completed' || $stateLower === 'completed') {
+            return 'completed';
+        }
+        
+        if ($stateLower === 'pending' || $stateLower === 'oczekujące') {
+            return 'pending';
+        }
+        
+        if ($stateLower === 'failed' || $stateLower === 'nieudane') {
+            return 'failed';
+        }
+        
+        return 'completed'; // Domyślnie completed
+    }
+
     private function parseDate(string $dateString): ?string
     {
         $dateString = trim($dateString);
@@ -189,6 +304,7 @@ class CsvImportService
 
         // Common date formats
         $formats = [
+            'Y-m-d H:i:s',  // Revolut format: 2022-04-04 15:21:56
             'Y-m-d',
             'd.m.Y',
             'd/m/Y',
@@ -201,7 +317,12 @@ class CsvImportService
         foreach ($formats as $format) {
             $date = \DateTime::createFromFormat($format, $dateString);
             if ($date !== false) {
-                return $date->format('Y-m-d');
+                // Jeśli format zawiera czas, zwróć pełną datę z czasem
+                if (strpos($format, 'H:i:s') !== false || strpos($format, 'H:i') !== false) {
+                    return $date->format('Y-m-d H:i:s');
+                }
+                // W przeciwnym razie zwróć datę z czasem 00:00:00
+                return $date->format('Y-m-d H:i:s');
             }
         }
 
@@ -264,8 +385,13 @@ class CsvImportService
             'amount' => $transactionData['amount'],
             'currency' => $transactionData['currency'],
             'transaction_date' => $transactionData['transaction_date'],
+            'booking_date' => $transactionData['booking_date'] ?? null,
+            'value_date' => $transactionData['value_date'] ?? null,
             'type' => $transactionData['type'],
             'status' => $transactionData['status'],
+            'balance_after' => $transactionData['balance_after'] ?? null,
+            'metadata' => $transactionData['metadata'] ?? null,
+            'provider' => $transactionData['provider'] ?? null,
             'is_imported' => $transactionData['is_imported'],
         ]);
 

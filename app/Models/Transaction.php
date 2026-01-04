@@ -27,7 +27,7 @@ class Transaction extends Model
         'merchant_name',
         'merchant_id',
         'transaction_date',
-        'booking_date',
+        'booking_date', // Dodano booking_date do fillable
         'value_date',
         'status',
         'reference',
@@ -40,9 +40,9 @@ class Transaction extends Model
     protected $casts = [
         'amount' => 'decimal:2',
         'balance_after' => 'decimal:2',
-        'transaction_date' => 'date',
-        'booking_date' => 'date',
-        'value_date' => 'date',
+        'transaction_date' => 'datetime',
+        'booking_date' => 'datetime',
+        'value_date' => 'datetime',
         'metadata' => 'array',
         'is_imported' => 'boolean',
         'ai_analyzed' => 'boolean',
